@@ -4,9 +4,8 @@ import { RunOptions } from '../types'
 export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
-		repo: 'rakkasjs/rakkasjs',
+		repo: 'web-infra-dev/modern.js',
 		branch: 'main',
-		build: 'build',
-		test: 'vite-ecosystem-ci',
+		test: ['test:e2e', 'cd ./tests/e2e/builder && pnpm run test'],
 	})
 }

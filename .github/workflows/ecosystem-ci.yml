@@ -1,5 +1,5 @@
-# integration tests for vite ecosystem projects - scheduled or manual run for all suites
-name: vite-ecosystem-ci
+# integration tests for rspack ecosystem projects - scheduled or manual run for all suites
+name: rspack-ecosystem-ci
 
 env:
   # 7 GiB by default on GitHub, setting to 6 GiB
@@ -8,7 +8,7 @@ env:
 
 on:
   schedule:
-    - cron: "0 5 * * 1,3,5" # monday,wednesday,friday 5AM
+    - cron: "0 5 * * 1,2,3,4,5" # workday 5AM
   workflow_dispatch:
     inputs:
       refType:
@@ -22,15 +22,15 @@ on:
           - release
         default: "branch"
       ref:
-        description: "vite ref to use"
+        description: "rspack ref to use"
         required: true
         type: string
         default: "main"
       repo:
-        description: "vite repository to use"
+        description: "rspack repository to use"
         required: true
         type: string
-        default: "vitejs/vite"
+        default: "web-infra-dev/rspack"
   repository_dispatch:
     types: [ecosystem-ci]
 jobs:
@@ -40,28 +40,7 @@ jobs:
     strategy:
       matrix:
         suite:
-          - astro
-          - histoire
-          - iles
-          - ladle
-          - laravel
-          - marko
-          - nuxt
-          - previewjs
-          - qwik
-          - rakkas
-          #          - storybook  # disabled until test is updated, see https://github.com/vitejs/vite-ecosystem-ci/issues/130
-          - sveltekit
-          - vite-plugin-ssr
-          - vite-plugin-react
-          - vite-plugin-react-pages
-          - vite-plugin-react-swc
-          - vite-plugin-svelte
-          - vite-plugin-vue
-          - vite-setup-catalogue
-          - vitepress
-          - vitest
-          - windicss
+          - modernjs
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -80,7 +59,7 @@ jobs:
       - run: >-
           pnpm tsx ecosystem-ci.ts
           --${{ inputs.refType || github.event.client_payload.refType || 'branch' }} ${{ inputs.ref || github.event.client_payload.ref || 'main' }}
-          --repo ${{ inputs.repo || github.event.client_payload.repo || 'vitejs/vite' }}
+          --repo ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
           ${{ matrix.suite }}
         id: ecosystem-ci-run
       - if: always()
@@ -89,7 +68,7 @@ jobs:
           WORKFLOW_NAME: ci
           REF_TYPE: ${{ inputs.refType || github.event.client_payload.refType || 'branch' }}
           REF: ${{ inputs.ref || github.event.client_payload.ref || 'main' }}
-          REPO: ${{ inputs.repo || github.event.client_payload.repo || 'vitejs/vite' }}
+          REPO: ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
           SUITE: ${{ matrix.suite }}
           STATUS: ${{ job.status }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

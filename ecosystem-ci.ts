@@ -5,38 +5,40 @@ import { cac } from 'cac'
 
 import {
 	setupEnvironment,
-	setupViteRepo,
-	buildVite,
-	bisectVite,
-	parseViteMajor,
+	setupRspackRepo,
+	buildRspack,
+	bisectRspack,
+	parseRspackMajor,
 	parseMajorVersion,
 } from './utils'
 import { CommandOptions, RunOptions } from './types'
 
 const cli = cac()
 cli
-	.command('[...suites]', 'build vite and run selected suites')
+	.command('[...suites]', 'build rspack and run selected suites')
 	.option('--verify', 'verify checkouts by running tests', { default: false })
-	.option('--repo <repo>', 'vite repository to use', { default: 'vitejs/vite' })
-	.option('--branch <branch>', 'vite branch to use', { default: 'main' })
-	.option('--tag <tag>', 'vite tag to use')
-	.option('--commit <commit>', 'vite commit sha to use')
-	.option('--release <version>', 'vite release to use from npm registry')
+	.option('--repo <repo>', 'rspack repository to use', {
+		default: 'web-infra-dev/rspack',
+	})
+	.option('--branch <branch>', 'rspack branch to use', { default: 'main' })
+	.option('--tag <tag>', 'rspack tag to use')
+	.option('--commit <commit>', 'rspack commit sha to use')
+	.option('--release <version>', 'rspack release to use from npm registry')
 	.action(async (suites, options: CommandOptions) => {
-		const { root, vitePath, workspace } = await setupEnvironment()
+		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
-		let viteMajor
+		let rspackMajor
 		if (!options.release) {
-			await setupViteRepo(options)
-			await buildVite({ verify: options.verify })
-			viteMajor = parseViteMajor(vitePath)
+			await setupRspackRepo(options)
+			await buildRspack({ verify: options.verify })
+			rspackMajor = parseRspackMajor(rspackPath)
 		} else {
-			viteMajor = parseMajorVersion(options.release)
+			rspackMajor = parseMajorVersion(options.release)
 		}
 		const runOptions: RunOptions = {
 			root,
-			vitePath,
-			viteMajor,
+			rspackPath,
+			rspackMajor,
 			workspace,
 			release: options.release,
 			verify: options.verify,
@@ -48,37 +50,41 @@ cli
 	})
 
 cli
-	.command('build-vite', 'build vite only')
-	.option('--verify', 'verify vite checkout by running tests', {
+	.command('build-rspack', 'build rspack only')
+	.option('--verify', 'verify rspack checkout by running tests', {
 		default: false,
 	})
-	.option('--repo <repo>', 'vite repository to use', { default: 'vitejs/vite' })
-	.option('--branch <branch>', 'vite branch to use', { default: 'main' })
-	.option('--tag <tag>', 'vite tag to use')
-	.option('--commit <commit>', 'vite commit sha to use')
+	.option('--repo <repo>', 'rspack repository to use', {
+		default: 'web-infra-dev/rspack',
+	})
+	.option('--branch <branch>', 'rspack branch to use', { default: 'main' })
+	.option('--tag <tag>', 'rspack tag to use')
+	.option('--commit <commit>', 'rspack commit sha to use')
 	.action(async (options: CommandOptions) => {
 		await setupEnvironment()
-		await setupViteRepo(options)
-		await buildVite({ verify: options.verify })
+		await setupRspackRepo(options)
+		await buildRspack({ verify: options.verify })
 	})
 
 cli
-	.command('run-suites [...suites]', 'run single suite with pre-built vite')
+	.command('run-suites [...suites]', 'run single suite with pre-built rspack')
 	.option(
 		'--verify',
-		'verify checkout by running tests before using local vite',
+		'verify checkout by running tests before using local rspack',
 		{ default: false },
 	)
-	.option('--repo <repo>', 'vite repository to use', { default: 'vitejs/vite' })
-	.option('--release <version>', 'vite release to use from npm registry')
+	.option('--repo <repo>', 'rspack repository to use', {
+		default: 'web-infra-dev/rspack',
+	})
+	.option('--release <version>', 'rspack release to use from npm registry')
 	.action(async (suites, options: CommandOptions) => {
-		const { root, vitePath, workspace } = await setupEnvironment()
+		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
 		const runOptions: RunOptions = {
 			...options,
 			root,
-			vitePath,
-			viteMajor: parseViteMajor(vitePath),
+			rspackPath,
+			rspackMajor: parseRspackMajor(rspackPath),
 			workspace,
 		}
 		for (const suite of suitesToRun) {
@@ -89,14 +95,16 @@ cli
 cli
 	.command(
 		'bisect [...suites]',
-		'use git bisect to find a commit in vite that broke suites',
+		'use git bisect to find a commit in rspack that broke suites',
 	)
 	.option('--good <ref>', 'last known good ref, e.g. a previous tag. REQUIRED!')
 	.option('--verify', 'verify checkouts by running tests', { default: false })
-	.option('--repo <repo>', 'vite repository to use', { default: 'vitejs/vite' })
-	.option('--branch <branch>', 'vite branch to use', { default: 'main' })
-	.option('--tag <tag>', 'vite tag to use')
-	.option('--commit <commit>', 'vite commit sha to use')
+	.option('--repo <repo>', 'rspack repository to use', {
+		default: 'web-infra-dev/rspack',
+	})
+	.option('--branch <branch>', 'rspack branch to use', { default: 'main' })
+	.option('--tag <tag>', 'rspack tag to use')
+	.option('--commit <commit>', 'rspack commit sha to use')
 	.action(async (suites, options: CommandOptions & { good: string }) => {
 		if (!options.good) {
 			console.log(
@@ -104,20 +112,20 @@ cli
 			)
 			process.exit(1)
 		}
-		const { root, vitePath, workspace } = await setupEnvironment()
+		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
 		let isFirstRun = true
 		const { verify } = options
 		const runSuite = async () => {
 			try {
-				await buildVite({ verify: isFirstRun && verify })
+				await buildRspack({ verify: isFirstRun && verify })
 				for (const suite of suitesToRun) {
 					await run(suite, {
 						verify: !!(isFirstRun && verify),
 						skipGit: !isFirstRun,
 						root,
-						vitePath,
-						viteMajor: parseViteMajor(vitePath),
+						rspackPath,
+						rspackMajor: parseRspackMajor(rspackPath),
 						workspace,
 					})
 				}
@@ -127,10 +135,10 @@ cli
 				return e
 			}
 		}
-		await setupViteRepo({ ...options, shallow: false })
+		await setupRspackRepo({ ...options, shallow: false })
 		const initialError = await runSuite()
 		if (initialError) {
-			await bisectVite(options.good, runSuite)
+			await bisectRspack(options.good, runSuite)
 		} else {
 			console.log(`no errors for starting commit, cannot bisect`)
 		}

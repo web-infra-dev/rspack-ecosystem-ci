@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import { fileURLToPath, pathToFileURL } from 'url'
+import { fileURLToPath } from 'url'
 import { execaCommand } from 'execa'
 import {
 	EnvironmentData,
@@ -13,12 +13,10 @@ import {
 //eslint-disable-next-line n/no-unpublished-import
 import { detect, AGENTS, Agent, getCommand } from '@antfu/ni'
 import actionsCore from '@actions/core'
-// eslint-disable-next-line n/no-unpublished-import
-import * as semver from 'semver'
 
 const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
-let vitePath: string
+let rspackPath: string
 let cwd: string
 let env: ProcessEnv
 
@@ -60,7 +58,7 @@ export async function setupEnvironment(): Promise<EnvironmentData> {
 	// @ts-expect-error import.meta
 	const root = dirnameFrom(import.meta.url)
 	const workspace = path.resolve(root, 'workspace')
-	vitePath = path.resolve(workspace, 'vite')
+	rspackPath = path.resolve(workspace, 'rspack')
 	cwd = process.cwd()
 	env = {
 		...process.env,
@@ -71,7 +69,7 @@ export async function setupEnvironment(): Promise<EnvironmentData> {
 		ECOSYSTEM_CI: 'true', // flag for tests, can be used to conditionally skip irrelevant tests.
 	}
 	initWorkspace(workspace)
-	return { root, workspace, vitePath, cwd, env }
+	return { root, workspace, rspackPath, cwd, env }
 }
 
 function initWorkspace(workspace: string) {
@@ -174,6 +172,36 @@ function toCommand(
 	}
 }
 
+export async function getRspackPackages() {
+	const bindingPkg = `${rspackPath}/crates/node_binding`
+	const jsPkgs = fs
+		.readdirSync(`${rspackPath}/packages`)
+		.map((name) => `${rspackPath}/packages/${name}`)
+	return (
+		[bindingPkg, ...jsPkgs]
+			// filter out non-directories
+			.filter((path) => fs.statSync(path).isDirectory())
+			// parse package.json
+			.map((directory) => {
+				const packageJson = JSON.parse(
+					fs.readFileSync(`${directory}/package.json`, 'utf-8'),
+				)
+				return {
+					directory,
+					packageJson,
+				}
+			})
+			// filter out packages that has `"private": true` in `package.json`
+			.filter(({ packageJson }) => {
+				return !packageJson.private
+			})
+			.map(({ packageJson, directory }) => ({
+				name: packageJson.name,
+				directory: directory,
+			}))
+	)
+}
+
 export async function runInRepo(options: RunOptions & RepoOptions) {
 	if (options.verify == null) {
 		options.verify = true
@@ -243,45 +271,25 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		await beforeTestCommand?.(pkg.scripts)
 		await testCommand?.(pkg.scripts)
 	}
-	let overrides = options.overrides || {}
+	const overrides = options.overrides || {}
+	const rspackPackages = await getRspackPackages()
 	if (options.release) {
-		if (overrides.vite && overrides.vite !== options.release) {
-			throw new Error(
-				`conflicting overrides.vite=${overrides.vite} and --release=${options.release} config. Use either one or the other`,
-			)
-		} else {
-			overrides.vite = options.release
+		for (const pkg of rspackPackages) {
+			if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
+				throw new Error(
+					`conflicting overrides[${pkg.name}]=${
+						overrides[pkg.name]
+					} and --release=${
+						options.release
+					} config. Use either one or the other`,
+				)
+			} else {
+				overrides[pkg.name] = options.release
+			}
 		}
 	} else {
-		overrides.vite ||= `${options.vitePath}/packages/vite`
-
-		overrides[
-			`@vitejs/plugin-legacy`
-		] ||= `${options.vitePath}/packages/plugin-legacy`
-		if (options.viteMajor < 4) {
-			overrides[
-				`@vitejs/plugin-vue`
-			] ||= `${options.vitePath}/packages/plugin-vue`
-			overrides[
-				`@vitejs/plugin-vue-jsx`
-			] ||= `${options.vitePath}/packages/plugin-vue-jsx`
-			overrides[
-				`@vitejs/plugin-react`
-			] ||= `${options.vitePath}/packages/plugin-react`
-			// vite-3 dependency setup could have caused problems if we don't synchronize node versions
-			// vite-4 uses an optional peerDependency instead so keep project types
-			const typesNodePath = fs.realpathSync(
-				`${options.vitePath}/node_modules/@types/node`,
-			)
-			overrides[`@types/node`] ||= `${typesNodePath}`
-		} else {
-			// starting with vite-4, we apply automatic overrides
-			const localOverrides = await buildOverrides(pkg, options, overrides)
-			cd(dir) // buildOverrides changed dir, change it back
-			overrides = {
-				...overrides,
-				...localOverrides,
-			}
+		for (const pkg of rspackPackages) {
+			overrides[pkg.name] ||= pkg.directory
 		}
 	}
 	await applyPackageOverrides(dir, pkg, overrides)
@@ -294,49 +302,19 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	return { dir }
 }
 
-export async function setupViteRepo(options: Partial<RepoOptions>) {
-	const repo = options.repo || 'vitejs/vite'
+export async function setupRspackRepo(options: Partial<RepoOptions>) {
+	const repo = options.repo || 'web-infra-dev/rspack'
 	await setupRepo({
 		repo,
-		dir: vitePath,
+		dir: rspackPath,
 		branch: 'main',
 		shallow: true,
 		...options,
 	})
-
-	try {
-		const rootPackageJsonFile = path.join(vitePath, 'package.json')
-		const rootPackageJson = JSON.parse(
-			await fs.promises.readFile(rootPackageJsonFile, 'utf-8'),
-		)
-		const viteMonoRepoNames = ['@vitejs/vite-monorepo', 'vite-monorepo']
-		const { name } = rootPackageJson
-		if (!viteMonoRepoNames.includes(name)) {
-			throw new Error(
-				`expected  "name" field of ${repo}/package.json to indicate vite monorepo, but got ${name}.`,
-			)
-		}
-		const needsWrite = await overridePackageManagerVersion(
-			rootPackageJson,
-			'pnpm',
-		)
-		if (needsWrite) {
-			fs.writeFileSync(
-				rootPackageJsonFile,
-				JSON.stringify(rootPackageJson, null, 2),
-				'utf-8',
-			)
-			if (rootPackageJson.devDependencies?.pnpm) {
-				await $`pnpm install -Dw pnpm --lockfile-only`
-			}
-		}
-	} catch (e) {
-		throw new Error(`Failed to setup vite repo`, { cause: e })
-	}
 }
 
 export async function getPermanentRef() {
-	cd(vitePath)
+	cd(rspackPath)
 	try {
 		const ref = await $`git log -1 --pretty=format:%h`
 		return ref
@@ -346,28 +324,30 @@ export async function getPermanentRef() {
 	}
 }
 
-export async function buildVite({ verify = false }) {
-	cd(vitePath)
+export async function buildRspack({ verify = false }) {
+	cd(rspackPath)
 	const frozenInstall = getCommand('pnpm', 'frozen')
-	const runBuild = getCommand('pnpm', 'run', ['build'])
-	const runTest = getCommand('pnpm', 'run', ['build'])
+	const runBuildBinding = getCommand('pnpm', 'run', ['build:binding:release'])
+	const runBuildJs = getCommand('pnpm', 'run', ['build:js'])
 	await $`${frozenInstall}`
-	await $`${runBuild}`
+	await $`${runBuildBinding}`
+	await $`${runBuildJs}`
 	if (verify) {
+		const runTest = getCommand('pnpm', 'run', ['test:js'])
 		await $`${runTest}`
 	}
 }
 
-export async function bisectVite(
+export async function bisectRspack(
 	good: string,
 	runSuite: () => Promise<Error | void>,
 ) {
-	// sometimes vite build modifies files in git, e.g. LICENSE.md
+	// sometimes rspack build modifies files in git, e.g. LICENSE.md
 	// this would stop bisect, so to reset those changes
 	const resetChanges = async () => $`git reset --hard HEAD`
 
 	try {
-		cd(vitePath)
+		cd(rspackPath)
 		await resetChanges()
 		await $`git bisect start`
 		await $`git bisect bad`
@@ -381,7 +361,7 @@ export async function bisectVite(
 				continue // see if next commit can be skipped too
 			}
 			const error = await runSuite()
-			cd(vitePath)
+			cd(rspackPath)
 			await resetChanges()
 			const bisectOut = await $`git bisect ${error ? 'bad' : 'good'}`
 			bisecting = bisectOut.substring(0, 10).toLowerCase() === 'bisecting:' // as long as git prints 'bisecting: ' there are more revisions to test
@@ -390,7 +370,7 @@ export async function bisectVite(
 		console.log('error while bisecting', e)
 	} finally {
 		try {
-			cd(vitePath)
+			cd(rspackPath)
 			await $`git bisect reset`
 		} catch (e) {
 			console.log('Error while resetting bisect', e)
@@ -411,49 +391,6 @@ function isLocalOverride(v: string): boolean {
 		}
 		return false
 	}
-}
-
-/**
- * utility to override packageManager version
- *
- * @param pkg parsed package.json
- * @param pm package manager to override eg. `pnpm`
- * @returns {boolean} true if pkg was updated, caller is responsible for writing it to disk
- */
-async function overridePackageManagerVersion(
-	pkg: { [key: string]: any },
-	pm: string,
-): Promise<boolean> {
-	const versionInUse = pkg.packageManager?.startsWith(`${pm}@`)
-		? pkg.packageManager.substring(pm.length + 1)
-		: await $`${pm} --version`
-	let overrideWithVersion: string | null = null
-	if (pm === 'pnpm') {
-		if (semver.eq(versionInUse, '7.18.0')) {
-			// avoid bug with absolute overrides in pnpm 7.18.0
-			overrideWithVersion = '7.18.1'
-		}
-	}
-	if (overrideWithVersion) {
-		console.warn(
-			`detected ${pm}@${versionInUse} used in ${pkg.name}, changing pkg.packageManager and pkg.engines.${pm} to enforce use of ${pm}@${overrideWithVersion}`,
-		)
-		// corepack reads this and uses pnpm @ newVersion then
-		pkg.packageManager = `${pm}@${overrideWithVersion}`
-		if (!pkg.engines) {
-			pkg.engines = {}
-		}
-		pkg.engines[pm] = overrideWithVersion
-
-		if (pkg.devDependencies?.[pm]) {
-			// if for some reason the pm is in devDependencies, that would be a local version that'd be preferred over our forced global
-			// so ensure it here too.
-			pkg.devDependencies[pm] = overrideWithVersion
-		}
-
-		return true
-	}
-	return false
 }
 
 export async function applyPackageOverrides(
@@ -480,8 +417,6 @@ export async function applyPackageOverrides(
 	// yarn@berry => yarn
 	// pnpm@6, pnpm@7 => pnpm
 	const pm = agent?.split('@')[0]
-
-	await overridePackageManagerVersion(pkg, pm)
 
 	if (pm === 'pnpm') {
 		if (!pkg.devDependencies) {
@@ -537,9 +472,9 @@ export function dirnameFrom(url: string) {
 	return path.dirname(fileURLToPath(url))
 }
 
-export function parseViteMajor(vitePath: string): number {
+export function parseRspackMajor(rspackPath: string): number {
 	const content = fs.readFileSync(
-		path.join(vitePath, 'packages', 'vite', 'package.json'),
+		path.join(rspackPath, 'packages', 'rspack', 'package.json'),
 		'utf-8',
 	)
 	const pkg = JSON.parse(content)
@@ -548,52 +483,4 @@ export function parseViteMajor(vitePath: string): number {
 
 export function parseMajorVersion(version: string) {
 	return parseInt(version.split('.', 1)[0], 10)
-}
-
-async function buildOverrides(
-	pkg: any,
-	options: RunOptions,
-	repoOverrides: Overrides,
-) {
-	const { root } = options
-	const buildsPath = path.join(root, 'builds')
-	const buildFiles: string[] = fs
-		.readdirSync(buildsPath)
-		.filter((f: string) => !f.startsWith('_') && f.endsWith('.ts'))
-		.map((f) => path.join(buildsPath, f))
-	const buildDefinitions: {
-		packages: { [key: string]: string }
-		build: (options: RunOptions) => Promise<{ dir: string }>
-		dir?: string
-	}[] = await Promise.all(buildFiles.map((f) => import(pathToFileURL(f).href)))
-	const deps = new Set([
-		...Object.keys(pkg.dependencies ?? {}),
-		...Object.keys(pkg.devDependencies ?? {}),
-		...Object.keys(pkg.peerDependencies ?? {}),
-	])
-
-	const needsOverride = (p: string) =>
-		repoOverrides[p] === true || (deps.has(p) && repoOverrides[p] == null)
-	const buildsToRun = buildDefinitions.filter(({ packages }) =>
-		Object.keys(packages).some(needsOverride),
-	)
-	const overrides: Overrides = {}
-	for (const buildDef of buildsToRun) {
-		const { dir } = await buildDef.build({
-			root: options.root,
-			workspace: options.workspace,
-			vitePath: options.vitePath,
-			viteMajor: options.viteMajor,
-			skipGit: options.skipGit,
-			release: options.release,
-			verify: options.verify,
-			// do not pass along scripts
-		})
-		for (const [name, path] of Object.entries(buildDef.packages)) {
-			if (needsOverride(name)) {
-				overrides[name] = `${dir}/${path}`
-			}
-		}
-	}
-	return overrides
 }
