@@ -54,3 +54,12 @@ Results are posted automatically to `#ecosystem-ci` on [Rspack discord](https://
 - set `Name` as `DISCORD_WEBHOOK_URL`
 - paste the discord webhook url you copied from above into `Value`
 - Click `Add secret`
+
+## Credits
+
+Thanks to:
+
+- [vitejs/vite-ecosystem-ci](https://github.com/vitejs/vite-ecosystem-ci)
+- [vuejs/ecosystem-ci](https://github.com/vuejs/ecosystem-ci)
+
+which inspired the development of this project.
