@@ -34,19 +34,24 @@ jobs:
   init:
     runs-on: ubuntu-latest
     outputs:
-      comment-id: ${{ steps.create-comment.outputs.comment-id }}
+      comment-id: ${{ steps.create-comment.outputs.result }}
     steps:
-      - id: create-eco-ci-url
+      - id: create-comment
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.ECOSYSTEM_CI_ACCESS_TOKEN }}
+          result-encoding: string
           script: |
             const url = `${context.serverUrl}//${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            return `⏳ Triggered ecosystem CI: [Open](${url})`
-      - id: create-comment
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.create-eco-ci-url.outputs.result }}
+            const urlLink = `[Open](${url})`
+
+            const { data: comment } = await github.rest.issues.createComment({
+              issue_number: context.payload.inputs.prNumber,
+              owner: context.repo.owner,
+              repo: 'rspack',
+              body: `⏳ Triggered ecosystem CI: ${urlLink}`
+            })
+            return comment.id
 
   execute-selected-suite:
     runs-on: ubuntu-latest
@@ -102,9 +107,9 @@ jobs:
     needs: [init, execute-selected-suite, execute-all]
     if: always()
     steps:
-      - id: create-eco-ci-result
-        uses: actions/github-script@v6
+      - uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.ECOSYSTEM_CI_ACCESS_TOKEN }}
           script: |
             const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
               owner: context.repo.owner,
@@ -143,10 +148,10 @@ jobs:
             |-------|--------|
             ${result.map(r => `| [${r.suite}](${r.link}) | ${conclusionEmoji[r.conclusion]} ${r.conclusion} |`).join("\n")}
             `
-            return body
-      - id: update-comment
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          comment-id: ${{ needs.init.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.create-eco-ci-result.outputs.result }}
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: 'rspack',
+              comment_id: ${{ needs.init.outputs.comment-id }},
+              body
+            })
