@@ -46,7 +46,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          script: ${{ steps.create-eco-ci-url.outputs.result }}
+          body: ${{ steps.create-eco-ci-url.outputs.result }}
 
   execute-selected-suite:
     runs-on: ubuntu-latest
@@ -149,4 +149,4 @@ jobs:
         with:
           comment-id: ${{ needs.init.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          script: ${{ steps.create-eco-ci-result.outputs.result }}
+          body: ${{ steps.create-eco-ci-result.outputs.result }}
