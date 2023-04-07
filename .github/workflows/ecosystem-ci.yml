@@ -8,7 +8,7 @@ env:
 
 on:
   schedule:
-    - cron: "0 5 * * 1,2,3,4,5" # workday 5AM
+    - cron: "0 5 * * 1-5" # UTC timezone, workday 5AM
   workflow_dispatch:
     inputs:
       refType:
