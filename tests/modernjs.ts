@@ -6,6 +6,6 @@ export async function test(options: RunOptions) {
 		...options,
 		repo: 'web-infra-dev/modern.js',
 		branch: 'main',
-		test: ['test:e2e', 'cd ./tests/e2e/builder && pnpm run test'],
+		test: ['test:rspack'],
 	})
 }
