@@ -13,6 +13,7 @@
 		"useUnknownInCatchVariables": false,
 		"allowSyntheticDefaultImports": true,
 		"lib": ["esnext"],
+		"resolveJsonModule": true,
 		"sourceMap": true
 	}
 }

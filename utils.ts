@@ -173,33 +173,11 @@ function toCommand(
 }
 
 export async function getRspackPackages() {
-	const bindingPkg = `${rspackPath}/crates/node_binding`
-	const jsPkgs = fs
-		.readdirSync(`${rspackPath}/packages`)
-		.map((name) => `${rspackPath}/packages/${name}`)
-	return (
-		[bindingPkg, ...jsPkgs]
-			// filter out non-directories
-			.filter((path) => fs.statSync(path).isDirectory())
-			// parse package.json
-			.map((directory) => {
-				const packageJson = JSON.parse(
-					fs.readFileSync(`${directory}/package.json`, 'utf-8'),
-				)
-				return {
-					directory,
-					packageJson,
-				}
-			})
-			// filter out packages that has `"private": true` in `package.json`
-			.filter(({ packageJson }) => {
-				return !packageJson.private
-			})
-			.map(({ packageJson, directory }) => ({
-				name: packageJson.name,
-				directory: directory,
-			}))
-	)
+	const { default: rspackPackages } = await import('./rspack-packages.json')
+	return rspackPackages.map((pkg) => ({
+		name: pkg.name,
+		directory: path.join(rspackPath, pkg.directory),
+	}))
 }
 
 export async function runInRepo(options: RunOptions & RepoOptions) {
