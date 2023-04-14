@@ -65,14 +65,14 @@ jobs:
           --repo ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
           ${{ matrix.suite }}
         id: ecosystem-ci-run
-      - if: always()
-        run: pnpm tsx discord-webhook.ts
-        env:
-          WORKFLOW_NAME: ci
-          REF_TYPE: ${{ inputs.refType || github.event.client_payload.refType || 'release' }}
-          REF: ${{ inputs.ref || github.event.client_payload.ref || 'nightly' }}
-          REPO: ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
-          SUITE: ${{ matrix.suite }}
-          STATUS: ${{ job.status }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - if: always()
+      #   run: pnpm tsx discord-webhook.ts
+      #   env:
+      #     WORKFLOW_NAME: ci
+      #     REF_TYPE: ${{ inputs.refType || github.event.client_payload.refType || 'release' }}
+      #     REF: ${{ inputs.ref || github.event.client_payload.ref || 'nightly' }}
+      #     REPO: ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
+      #     SUITE: ${{ matrix.suite }}
+      #     STATUS: ${{ job.status }}
+      #     DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

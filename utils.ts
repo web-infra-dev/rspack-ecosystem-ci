@@ -20,7 +20,7 @@ let rspackPath: string
 let cwd: string
 let env: ProcessEnv
 
-function cd(dir: string) {
+export function cd(dir: string) {
 	cwd = path.resolve(cwd, dir)
 }
 
