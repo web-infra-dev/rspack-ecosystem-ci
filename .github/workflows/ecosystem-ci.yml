@@ -8,7 +8,8 @@ env:
 
 on:
   schedule:
-    - cron: "0 5 * * 1-5" # UTC timezone, workday 5AM
+    # 02:07 AM Beijing Time, offset an odd number to avoid cron jobs firing off at the same time
+    - cron: "7 18 * * *"
   workflow_dispatch:
     inputs:
       refType:
@@ -57,7 +58,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
-          --${{ inputs.refType || github.event.client_payload.refType || 'branch' }} ${{ inputs.ref || github.event.client_payload.ref || 'main' }}
+          --${{ inputs.refType || github.event.client_payload.refType || 'release' }} ${{ inputs.ref || github.event.client_payload.ref || 'nightly' }}
           --repo ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
           ${{ matrix.suite }}
         id: ecosystem-ci-run
@@ -65,8 +66,8 @@ jobs:
         run: pnpm tsx discord-webhook.ts
         env:
           WORKFLOW_NAME: ci
-          REF_TYPE: ${{ inputs.refType || github.event.client_payload.refType || 'branch' }}
-          REF: ${{ inputs.ref || github.event.client_payload.ref || 'main' }}
+          REF_TYPE: ${{ inputs.refType || github.event.client_payload.refType || 'release' }}
+          REF: ${{ inputs.ref || github.event.client_payload.ref || 'nightly' }}
           REPO: ${{ inputs.repo || github.event.client_payload.repo || 'web-infra-dev/rspack' }}
           SUITE: ${{ matrix.suite }}
           STATUS: ${{ job.status }}
