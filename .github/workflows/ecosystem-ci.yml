@@ -41,6 +41,7 @@ jobs:
       matrix:
         suite:
           - modernjs
+          - nx
       fail-fast: false
     steps:
       - uses: actions/checkout@v3

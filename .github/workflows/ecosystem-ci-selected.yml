@@ -35,6 +35,7 @@ on:
         type: choice
         options:
           - modernjs
+          - nx
 jobs:
   execute-selected-suite:
     runs-on: ubuntu-latest
