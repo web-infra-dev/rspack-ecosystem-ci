@@ -8,8 +8,8 @@ env:
 
 on:
   schedule:
-    # 02:07 AM Beijing Time, offset an odd number to avoid cron jobs firing off at the same time
-    - cron: "7 18 * * *"
+    # 10:00 AM Beijing Time, every day.
+    - cron: "0 2 * * 0,1,2,3,4,5,6"
   workflow_dispatch:
     inputs:
       refType:
