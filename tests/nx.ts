@@ -4,9 +4,9 @@ import { RunOptions } from '../types'
 export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
-		repo: 'mandarini/nx-rspack-example',
+		repo: 'nrwl/nx-labs',
 		branch: 'main',
-		build: 'build-ci',
-		test: ['test-ci', 'e2e-ci'],
+		build: ['build rspack'],
+		test: ['test rspack', 'e2e rspack'],
 	})
 }
