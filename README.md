@@ -26,6 +26,8 @@ Workflows are sheduled to run automatically every Workday
 You can pass `--tag v2.8.0-beta.1`, `--branch somebranch` or `--commit abcd1234` option to select a specific rspack version to build.
 If you pass `--release 2.7.13`, rspack build will be skipped and rspack is fetched from the registry instead
 
+**`pnpm test -- --release nightly <suitename>` we recommend use nightly release to test rspack locally, to save time from building rspack locally**
+
 The repositories are checked out into `workspace` subdirectory as shallow clones
 
 # how to add a new integration test
