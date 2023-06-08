@@ -412,6 +412,13 @@ export async function applyPackageOverrides(
 			...overrides,
 		}
 	} else if (pm === 'yarn') {
+		if (!pkg.devDependencies) {
+			pkg.devDependencies = {}
+		}
+		pkg.devDependencies = {
+			...pkg.devDependencies,
+			...overrides, // overrides must be present in devDependencies or dependencies otherwise they may not work
+		}
 		pkg.resolutions = {
 			...pkg.resolutions,
 			...overrides,
