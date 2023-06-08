@@ -174,9 +174,14 @@ function createTargetText(
 		return `[${repoText}${ref} (${permRef || 'unknown'})](${link})`
 	}
 
-	const refTypeText = refType === 'release' ? ' (release)' : ''
+	if (refType === 'release') {
+		const refTypeText = ' (release)'
+		const link = `https://www.npmjs.com/package/@rspack/core/v/${ref}`
+		return `[${repoText}${ref}${refTypeText}](${link})`
+	}
+
 	const link = `https://github.com/${repo}/commits/${ref}`
-	return `[${repoText}${ref}${refTypeText}](${link})`
+	return `[${repoText}${ref}](${link})`
 }
 
 run().catch((e) => {
