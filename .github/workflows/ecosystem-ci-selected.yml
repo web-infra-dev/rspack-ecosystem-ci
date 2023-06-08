@@ -30,28 +30,26 @@ on:
         type: string
         default: "web-infra-dev/rspack"
       suite:
-        description: "testsuite to run"
+        description: "testsuite to run. runs all testsuits when `-`."
         required: true
         type: choice
         options:
+          - "-"
           - modernjs
           - nx
+
 jobs:
   execute-selected-suite:
     runs-on: ubuntu-latest
+    if: "inputs.suite != '-'"
     steps:
       - uses: actions/checkout@v3
-      - uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-        id: setup-node
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-        id: setup-deno
         continue-on-error: true
       - run: corepack enable
       - run: pnpm --version
@@ -61,15 +59,52 @@ jobs:
           --${{ inputs.refType }} ${{ inputs.ref }}
           --repo ${{ inputs.repo }}
           ${{ inputs.suite }}
-        id: ecosystem-ci-run
       - if: always()
         run: pnpm tsx discord-webhook.ts
         env:
-          WORKFLOW_NAME: ci-selected
+          WORKFLOW_NAME: ci-selected-one
           REF_TYPE: ${{ inputs.refType }}
           REF: ${{ inputs.ref }}
           REPO: ${{ inputs.repo }}
           SUITE: ${{ inputs.suite }}
+          STATUS: ${{ job.status }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  execute-all:
+    runs-on: ubuntu-latest
+    if: "inputs.suite == '-'"
+    strategy:
+      matrix:
+        suite:
+          - modernjs
+          - nx
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+        continue-on-error: true
+      - run: corepack enable
+      - run: pnpm --version
+      - run: pnpm i --frozen-lockfile
+      - run: >-
+          pnpm tsx ecosystem-ci.ts
+          --${{ inputs.refType }} ${{ inputs.ref }}
+          --repo ${{ inputs.repo }}
+          ${{ matrix.suite }}
+      - if: always()
+        run: pnpm tsx discord-webhook.ts
+        env:
+          WORKFLOW_NAME: ci-selected-all
+          REF_TYPE: ${{ inputs.refType }}
+          REF: ${{ inputs.ref }}
+          REPO: ${{ inputs.repo }}
+          SUITE: ${{ matrix.suite }}
           STATUS: ${{ job.status }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
