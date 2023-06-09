@@ -1,4 +1,4 @@
-# integration tests for rspack ecosystem - single run of selected testsuite
+# integration tests for rspack ecosystem - run for selected one testsuite or all testsuites
 name: rspack-ecosystem-ci-selected
 
 env:
