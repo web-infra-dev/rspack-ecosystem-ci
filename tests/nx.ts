@@ -6,7 +6,7 @@ export async function test(options: RunOptions) {
 		...options,
 		repo: 'nrwl/nx-labs',
 		branch: 'main',
-		build: ['build rspack'],
-		test: ['test rspack', 'e2e rspack-e2e'],
+		build: ['yarn nx build rspack'],
+		test: ['yarn nx test rspack', 'yarn nx e2e rspack-e2e'],
 	})
 }
