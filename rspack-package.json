@@ -54,7 +54,7 @@
 		],
 		"linux-x64": [
 			{
-				"name": "@rspack/binding-linux-x64",
+				"name": "@rspack/binding-linux-x64-gnu",
 				"directory": "npm/linux-x64-gnu"
 			}
 		],
