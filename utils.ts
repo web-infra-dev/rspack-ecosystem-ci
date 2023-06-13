@@ -13,6 +13,7 @@ import {
 //eslint-disable-next-line n/no-unpublished-import
 import { detect, AGENTS, Agent, getCommand } from '@antfu/ni'
 import actionsCore from '@actions/core'
+import assert from 'assert'
 
 const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
@@ -172,12 +173,28 @@ function toCommand(
 	}
 }
 
-export async function getRspackPackages() {
-	const { default: rspackPackages } = await import('./rspack-packages.json')
-	return rspackPackages.map((pkg) => ({
+type RspackPackageInfo = { name: string; directory: string }
+
+export async function getRspackPackage() {
+	const {
+		default: { npm, binding, packages },
+	} = await import('./rspack-package.json')
+	const optionalKey = `${process.platform}-${process.arch}`
+	assert(
+		Object.keys(npm).includes(optionalKey),
+		`${optionalKey} is not supported`,
+	)
+	const normalizeInfo = (pkg: RspackPackageInfo) => ({
 		name: pkg.name,
 		directory: path.join(rspackPath, pkg.directory),
-	}))
+	})
+	return {
+		npm: npm[
+			optionalKey as 'darwin-arm64' | 'darwin-x64' | 'linux-x64' | 'win32-x64'
+		].map(normalizeInfo),
+		binding: binding.map(normalizeInfo),
+		packages: packages.map(normalizeInfo),
+	}
 }
 
 export async function runInRepo(options: RunOptions & RepoOptions) {
@@ -250,9 +267,14 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		await testCommand?.(pkg.scripts)
 	}
 	const overrides = options.overrides || {}
-	const rspackPackages = await getRspackPackages()
+	const rspackPackage = await getRspackPackage()
+	const packages = [
+		...rspackPackage.npm,
+		...rspackPackage.binding,
+		...rspackPackage.packages,
+	]
 	if (options.release) {
-		for (const pkg of rspackPackages) {
+		for (const pkg of packages) {
 			if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
 				throw new Error(
 					`conflicting overrides[${pkg.name}]=${
@@ -266,10 +288,11 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 			}
 		}
 	} else {
-		for (const pkg of rspackPackages) {
+		for (const pkg of packages) {
 			overrides[pkg.name] ||= pkg.directory
 		}
 	}
+	await patchBindingPackageJson(rspackPackage.binding)
 	await applyPackageOverrides(dir, pkg, overrides)
 	await beforeBuildCommand?.(pkg.scripts)
 	await buildCommand?.(pkg.scripts)
@@ -306,9 +329,13 @@ export async function buildRspack({ verify = false }) {
 	cd(rspackPath)
 	const frozenInstall = getCommand('pnpm', 'frozen')
 	const runBuildBinding = getCommand('pnpm', 'run', ['build:binding:release'])
+	const runMoveBinding = getCommand('pnpm', 'run', [
+		'--filter @rspack/binding move-binding',
+	])
 	const runBuildJs = getCommand('pnpm', 'run', ['build:js'])
 	await $`${frozenInstall}`
 	await $`${runBuildBinding}`
+	await $`${runMoveBinding}`
 	await $`${runBuildJs}`
 	if (verify) {
 		const runTest = getCommand('pnpm', 'run', ['test:js'])
@@ -371,7 +398,16 @@ function isLocalOverride(v: string): boolean {
 	}
 }
 
-export async function applyPackageOverrides(
+async function patchBindingPackageJson(infos: RspackPackageInfo[]) {
+	for (const bindingInfo of infos) {
+		const pkgJsonPath = path.join(bindingInfo.directory, 'package.json')
+		const pkgJson = JSON.parse(await fs.promises.readFile(pkgJsonPath, 'utf-8'))
+		delete pkgJson['optionalDependencies']
+		await fs.promises.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2))
+	}
+}
+
+async function applyPackageOverrides(
 	dir: string,
 	pkg: any,
 	overrides: Overrides = {},

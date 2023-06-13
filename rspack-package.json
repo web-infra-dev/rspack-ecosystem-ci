@@ -1,0 +1,68 @@
+{
+	"binding": [
+		{
+			"name": "@rspack/binding",
+			"directory": "crates/node_binding"
+		}
+	],
+	"packages": [
+		{
+			"name": "@rspack/core",
+			"directory": "packages/rspack"
+		},
+		{
+			"name": "@rspack/dev-client",
+			"directory": "packages/rspack-dev-client"
+		},
+		{
+			"name": "@rspack/dev-middleware",
+			"directory": "packages/rspack-dev-middleware"
+		},
+		{
+			"name": "@rspack/dev-server",
+			"directory": "packages/rspack-dev-server"
+		},
+		{
+			"name": "@rspack/plugin-html",
+			"directory": "packages/rspack-plugin-html"
+		},
+		{
+			"name": "@rspack/plugin-minify",
+			"directory": "packages/rspack-plugin-minify"
+		},
+		{
+			"name": "@rspack/plugin-node-polyfill",
+			"directory": "packages/rspack-plugin-node-polyfill"
+		},
+		{
+			"name": "@rspack/postcss-loader",
+			"directory": "packages/postcss-loader"
+		}
+	],
+	"npm": {
+		"darwin-arm64": [
+			{
+				"name": "@rspack/binding-darwin-arm64",
+				"directory": "npm/darwin-arm64"
+			}
+		],
+		"darwin-x64": [
+			{
+				"name": "@rspack/binding-darwin-x64",
+				"directory": "npm/darwin-x64"
+			}
+		],
+		"linux-x64": [
+			{
+				"name": "@rspack/binding-linux-x64",
+				"directory": "npm/linux-x64-gnu"
+			}
+		],
+		"win32-x64": [
+			{
+				"name": "@rspack/binding-win32-x64-msvc",
+				"directory": "npm/win32-x64-msvc"
+			}
+		]
+	}
+}
