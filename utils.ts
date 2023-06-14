@@ -274,7 +274,6 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		...rspackPackage.packages,
 	]
 	if (options.release) {
-		await patchBindingPackageJson(rspackPackage.binding)
 		for (const pkg of packages) {
 			if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
 				throw new Error(
@@ -289,6 +288,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 			}
 		}
 	} else {
+		await patchBindingPackageJson(rspackPackage.binding)
 		for (const pkg of packages) {
 			overrides[pkg.name] ||= pkg.directory
 		}
