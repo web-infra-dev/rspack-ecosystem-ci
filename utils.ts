@@ -269,11 +269,12 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	const overrides = options.overrides || {}
 	const rspackPackage = await getRspackPackage()
 	const packages = [
-		...rspackPackage.npm,
+		...(options.release ? [] : rspackPackage.npm),
 		...rspackPackage.binding,
 		...rspackPackage.packages,
 	]
 	if (options.release) {
+		await patchBindingPackageJson(rspackPackage.binding)
 		for (const pkg of packages) {
 			if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
 				throw new Error(
@@ -292,7 +293,6 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 			overrides[pkg.name] ||= pkg.directory
 		}
 	}
-	await patchBindingPackageJson(rspackPackage.binding)
 	await applyPackageOverrides(dir, pkg, overrides)
 	await beforeBuildCommand?.(pkg.scripts)
 	await buildCommand?.(pkg.scripts)
