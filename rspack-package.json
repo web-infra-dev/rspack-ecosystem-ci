@@ -29,10 +29,6 @@
 		{
 			"name": "@rspack/plugin-node-polyfill",
 			"directory": "packages/rspack-plugin-node-polyfill"
-		},
-		{
-			"name": "@rspack/postcss-loader",
-			"directory": "packages/postcss-loader"
 		}
 	],
 	"npm": {
