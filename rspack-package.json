@@ -15,10 +15,6 @@
 			"directory": "packages/rspack-dev-client"
 		},
 		{
-			"name": "@rspack/dev-middleware",
-			"directory": "packages/rspack-dev-middleware"
-		},
-		{
 			"name": "@rspack/dev-server",
 			"directory": "packages/rspack-dev-server"
 		},
