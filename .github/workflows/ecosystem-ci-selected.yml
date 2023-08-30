@@ -37,6 +37,7 @@ on:
           - "-"
           - modernjs
           - nx
+          - rspress
 
 jobs:
   execute-selected-suite:
@@ -79,6 +80,7 @@ jobs:
         suite:
           - modernjs
           - nx
+          - rspress
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
