@@ -1,4 +1,4 @@
-import { runInRepo, $ } from '../utils'
+import { runInRepo, $, cd } from '../utils'
 import { RunOptions } from '../types'
 
 export async function test(options: RunOptions) {
@@ -7,8 +7,9 @@ export async function test(options: RunOptions) {
 		repo: 'web-infra-dev/rsbuild',
 		branch: 'main',
 		beforeTest: async () => {
+			cd('./e2e')
 			await $`pnpm playwright install`
 		},
-		test: ['e2e:rspack'],
+		test: ['test:rspack'],
 	})
 }
