@@ -38,7 +38,7 @@ on:
           - modernjs
           - nx
           - rspress
-					- rsbuild
+          - rsbuild
 
 jobs:
   execute-selected-suite:
@@ -82,7 +82,7 @@ jobs:
           - modernjs
           - nx
           - rspress
-					- rsbuild
+          - rsbuild
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
