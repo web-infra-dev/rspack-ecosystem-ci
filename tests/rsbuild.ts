@@ -9,7 +9,8 @@ export async function test(options: RunOptions) {
 		beforeTest: async () => {
 			cd('./e2e')
 			await $`pnpm playwright install`
+			cd('..')
 		},
-		test: ['test:rspack'],
+		test: ['e2e:rspack'],
 	})
 }
