@@ -33,6 +33,7 @@ on:
           - nx
           - rspress
           - rsbuild
+          - compat
 jobs:
   init:
     runs-on: ubuntu-latest
@@ -89,6 +90,7 @@ jobs:
           - nx
           - rspress
           - rsbuild
+          - compat
       fail-fast: false
     steps:
       - uses: actions/checkout@v3

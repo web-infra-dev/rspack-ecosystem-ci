@@ -39,6 +39,7 @@ on:
           - nx
           - rspress
           - rsbuild
+          - compat
 
 jobs:
   execute-selected-suite:
@@ -83,6 +84,7 @@ jobs:
           - nx
           - rspress
           - rsbuild
+          - compat
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
