@@ -40,6 +40,21 @@ on:
           - rspress
           - rsbuild
           - compat
+      modernRef:
+        description: "modern.js branch name to use"
+        required: true
+        type: string
+        default: "main"
+      rspressRef:
+        description: "rspress branch name to use"
+        required: true
+        type: string
+        default: "main"
+      rsbuildRef:
+        description: "rsbuild branch name to use"
+        required: true
+        type: string
+        default: "main"
 
 jobs:
   execute-selected-suite:
@@ -62,6 +77,10 @@ jobs:
           --${{ inputs.refType }} ${{ inputs.ref }}
           --repo ${{ inputs.repo }}
           ${{ inputs.suite }}
+        env:
+          MODERN_REF: ${{ inputs.modernRef }}
+          RSPRESS_REF: ${{ inputs.rspressRef }}
+          RSBUILD_REF: ${{ inputs.rsbuildRef }}
       - if: always()
         run: pnpm tsx discord-webhook.ts
         env:

@@ -5,7 +5,7 @@ export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
 		repo: 'web-infra-dev/rspress',
-		branch: 'main',
+		branch: process.env.RSPRESS_REF ?? 'main',
 		beforeTest: async () => {
 			await $`pnpm playwright install`
 		},
