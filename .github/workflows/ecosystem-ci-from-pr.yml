@@ -34,6 +34,21 @@ on:
           - rspress
           - rsbuild
           - compat
+      modernRef:
+        description: "modern.js branch name to use"
+        required: true
+        type: string
+        default: "main"
+      rspressRef:
+        description: "rspress branch name to use"
+        required: true
+        type: string
+        default: "main"
+      rsbuildRef:
+        description: "rsbuild branch name to use"
+        required: true
+        type: string
+        default: "main"
 jobs:
   init:
     runs-on: ubuntu-latest
@@ -78,6 +93,10 @@ jobs:
           --branch ${{ inputs.branchName }}
           --repo ${{ inputs.repo }}
           ${{ inputs.suite }}
+        env:
+          MODERN_REF: ${{ inputs.modernRef }}
+          RSPRESS_REF: ${{ inputs.rspressRef }}
+          RSBUILD_REF: ${{ inputs.rsbuildRef }}
 
   execute-all:
     runs-on: ubuntu-latest
@@ -109,6 +128,10 @@ jobs:
           --branch ${{ inputs.branchName }}
           --repo ${{ inputs.repo }}
           ${{ matrix.suite }}
+        env:
+          MODERN_REF: ${{ inputs.modernRef }}
+          RSPRESS_REF: ${{ inputs.rspressRef }}
+          RSBUILD_REF: ${{ inputs.rsbuildRef }}
 
   update-comment:
     runs-on: ubuntu-latest

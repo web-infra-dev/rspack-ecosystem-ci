@@ -105,6 +105,7 @@ async function createRunUrl(suite: string) {
 	}
 
 	if (result.total_count <= 0) {
+		a
 		console.warn('total_count was 0')
 		return undefined
 	}
