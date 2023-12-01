@@ -229,7 +229,13 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	)
 
 	if (!skipGit) {
-		await setupRepo({ repo, dir, branch, tag, commit })
+		await setupRepo({
+			repo,
+			dir,
+			branch: options.suiteBranch ?? branch,
+			tag: options.suiteTag ?? tag,
+			commit: options.suiteCommit ?? commit,
+		})
 	} else {
 		cd(dir)
 	}
@@ -505,4 +511,8 @@ export function parseRspackMajor(rspackPath: string): number {
 
 export function parseMajorVersion(version: string) {
 	return parseInt(version.split('.', 1)[0], 10)
+}
+
+export function ignoreDash(str: string | undefined) {
+	return str !== '-' ? str : undefined
 }

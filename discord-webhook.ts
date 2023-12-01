@@ -54,6 +54,13 @@ async function run() {
 	assertEnv('STATUS', env.STATUS)
 	assertEnv('DISCORD_WEBHOOK_URL', env.DISCORD_WEBHOOK_URL)
 
+	{
+		const [suite, suiteRefType] = env.SUITE.split(' ')
+		if (suiteRefType === 'precoded') {
+			env.SUITE = suite
+		}
+	}
+
 	await setupEnvironment()
 
 	const refType = env.REF_TYPE

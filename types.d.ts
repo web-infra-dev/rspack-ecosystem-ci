@@ -22,12 +22,14 @@ export interface RunOptions {
 	beforeInstall?: Task | Task[]
 	beforeBuild?: Task | Task[]
 	beforeTest?: Task | Task[]
+	suiteBranch?: string
+	suiteTag?: string
+	suiteCommit?: string
 }
 
 type Task = string | (() => Promise<any>)
 
 export interface CommandOptions {
-	suites?: string[]
 	repo?: string
 	branch?: string
 	tag?: string
@@ -35,6 +37,9 @@ export interface CommandOptions {
 	release?: string
 	verify?: boolean
 	skipGit?: boolean
+	suiteBranch?: string
+	suiteTag?: string
+	suiteCommit?: string
 }
 
 export interface RepoOptions {

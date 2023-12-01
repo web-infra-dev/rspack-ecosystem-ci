@@ -10,6 +10,7 @@ import {
 	bisectRspack,
 	parseRspackMajor,
 	parseMajorVersion,
+	ignoreDash,
 } from './utils'
 import { CommandOptions, RunOptions } from './types'
 
@@ -24,6 +25,10 @@ cli
 	.option('--tag <tag>', 'rspack tag to use')
 	.option('--commit <commit>', 'rspack commit sha to use')
 	.option('--release <version>', 'rspack release to use from npm registry')
+	.option('--suite-precoded', 'use precoded suite options under tests dir')
+	.option('--suite-branch <branch>', 'suite branch to use')
+	.option('--suite-tag <tag>', 'suite tag to use')
+	.option('--suite-commit <commit>', 'suite commit sha to use')
 	.action(async (suites, options: CommandOptions) => {
 		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
@@ -43,6 +48,9 @@ cli
 			release: options.release,
 			verify: options.verify,
 			skipGit: false,
+			suiteBranch: ignoreDash(options.suiteBranch),
+			suiteTag: ignoreDash(options.suiteTag),
+			suiteCommit: ignoreDash(options.suiteCommit),
 		}
 		for (const suite of suitesToRun) {
 			await run(suite, runOptions)
@@ -77,6 +85,10 @@ cli
 		default: 'web-infra-dev/rspack',
 	})
 	.option('--release <version>', 'rspack release to use from npm registry')
+	.option('--suite-precoded', 'use precoded suite options under tests dir')
+	.option('--suite-branch <branch>', 'suite branch to use')
+	.option('--suite-tag <tag>', 'suite tag to use')
+	.option('--suite-commit <commit>', 'suite commit sha to use')
 	.action(async (suites, options: CommandOptions) => {
 		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
@@ -86,6 +98,9 @@ cli
 			rspackPath,
 			rspackMajor: parseRspackMajor(rspackPath),
 			workspace,
+			suiteBranch: ignoreDash(options.suiteBranch),
+			suiteTag: ignoreDash(options.suiteTag),
+			suiteCommit: ignoreDash(options.suiteCommit),
 		}
 		for (const suite of suitesToRun) {
 			await run(suite, runOptions)
@@ -105,6 +120,10 @@ cli
 	.option('--branch <branch>', 'rspack branch to use', { default: 'main' })
 	.option('--tag <tag>', 'rspack tag to use')
 	.option('--commit <commit>', 'rspack commit sha to use')
+	.option('--suite-precoded', 'use precoded suite options under tests dir')
+	.option('--suite-branch <branch>', 'suite branch to use')
+	.option('--suite-tag <tag>', 'suite tag to use')
+	.option('--suite-commit <commit>', 'suite commit sha to use')
 	.action(async (suites, options: CommandOptions & { good: string }) => {
 		if (!options.good) {
 			console.log(
@@ -127,6 +146,9 @@ cli
 						rspackPath,
 						rspackMajor: parseRspackMajor(rspackPath),
 						workspace,
+						suiteBranch: ignoreDash(options.suiteBranch),
+						suiteTag: ignoreDash(options.suiteTag),
+						suiteCommit: ignoreDash(options.suiteCommit),
 					})
 				}
 				isFirstRun = false

@@ -34,21 +34,22 @@ on:
           - rspress
           - rsbuild
           - compat
-      modernRef:
-        description: "modern.js branch name to use"
-        required: true
+      suiteRefType:
+        description: "type of suite ref to use"
+        required: false
+        type: choice
+        options:
+          - precoded
+          - branch
+          - tag
+          - commit
+        default: "precoded"
+      suiteRef:
+        description: "suite ref to use"
+        required: false
         type: string
-        default: "main"
-      rspressRef:
-        description: "rspress branch name to use"
-        required: true
-        type: string
-        default: "main"
-      rsbuildRef:
-        description: "rsbuild branch name to use"
-        required: true
-        type: string
-        default: "main"
+        default: "-"
+
 jobs:
   init:
     runs-on: ubuntu-latest
@@ -92,11 +93,8 @@ jobs:
           pnpm tsx ecosystem-ci.ts
           --branch ${{ inputs.branchName }}
           --repo ${{ inputs.repo }}
+          --suite-${{ inputs.suiteRefType }} ${{ inputs.suiteRef }}
           ${{ inputs.suite }}
-        env:
-          MODERN_REF: ${{ inputs.modernRef }}
-          RSPRESS_REF: ${{ inputs.rspressRef }}
-          RSBUILD_REF: ${{ inputs.rsbuildRef }}
 
   execute-all:
     runs-on: ubuntu-latest
@@ -128,10 +126,6 @@ jobs:
           --branch ${{ inputs.branchName }}
           --repo ${{ inputs.repo }}
           ${{ matrix.suite }}
-        env:
-          MODERN_REF: ${{ inputs.modernRef }}
-          RSPRESS_REF: ${{ inputs.rspressRef }}
-          RSBUILD_REF: ${{ inputs.rsbuildRef }}
 
   update-comment:
     runs-on: ubuntu-latest
@@ -153,7 +147,7 @@ jobs:
             let result
             if (selectedSuite !== "-") {
               const { conclusion, html_url } = jobs.find(job => job.name === "execute-selected-suite")
-              result = [{ suite: selectedSuite, conclusion, link: html_url }]
+              result = [{ suite: `${selectedSuite} ${context.payload.inputs.suiteRefType} ${context.payload.inputs.suiteRef}`, conclusion, link: html_url }]
             } else {
               result = jobs
                 .filter(job => job.name.startsWith('execute-all '))
