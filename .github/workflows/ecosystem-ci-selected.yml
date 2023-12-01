@@ -42,7 +42,7 @@ on:
           - compat
       suiteRefType:
         description: "type of suite ref to use"
-        required: false
+        required: true
         type: choice
         options:
           - precoded
@@ -52,7 +52,7 @@ on:
         default: "precoded"
       suiteRef:
         description: "suite ref to use"
-        required: false
+        required: true
         type: string
         default: "precoded"
 
