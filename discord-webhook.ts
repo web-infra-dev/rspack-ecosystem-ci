@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { getPermanentRef, setupEnvironment } from './utils'
+import { getPermanentRef, ignorePrecoded, setupEnvironment } from './utils'
 
 type RefType = 'branch' | 'tag' | 'commit' | 'release'
 type Status = 'success' | 'failure' | 'cancelled'
@@ -9,6 +9,8 @@ type Env = {
 	REF?: string
 	REPO?: string
 	SUITE?: string
+	SUITE_REF_TYPE?: string
+	SUITE_REF?: string
 	STATUS?: Status
 	DISCORD_WEBHOOK_URL?: string
 }
@@ -51,23 +53,22 @@ async function run() {
 	assertEnv('REF', env.REF)
 	assertEnv('REPO', env.REPO)
 	assertEnv('SUITE', env.SUITE)
+	assertEnv('SUITE_REF_TYPE', env.SUITE_REF_TYPE)
+	assertEnv('SUITE_REF', env.SUITE_REF)
 	assertEnv('STATUS', env.STATUS)
 	assertEnv('DISCORD_WEBHOOK_URL', env.DISCORD_WEBHOOK_URL)
-
-	{
-		const [suite, suiteRefType] = env.SUITE.split(' ')
-		if (suiteRefType === 'precoded') {
-			env.SUITE = suite
-		}
-	}
 
 	await setupEnvironment()
 
 	const refType = env.REF_TYPE
 	// rspack repo is not cloned when release
 	const permRef = refType === 'release' ? undefined : await getPermanentRef()
-
 	const targetText = createTargetText(refType, env.REF, permRef, env.REPO)
+	const suiteRefType = ignorePrecoded(env.SUITE_REF_TYPE)
+	const suiteRef = ignorePrecoded(env.SUITE_REF)
+	const titleText = `${env.SUITE}${suiteRefType ? ` ${suiteRefType}` : ''}${
+		suiteRef ? ` ${suiteRef}` : ''
+	}`
 
 	const webhookContent = {
 		username: `rspack-ecosystem-ci (${env.WORKFLOW_NAME})`,
@@ -75,7 +76,7 @@ async function run() {
 			'https://raw.githubusercontent.com/web-infra-dev/rspack-website/main/docs/public/logo.png',
 		embeds: [
 			{
-				title: `${statusConfig[env.STATUS].emoji}  ${env.SUITE}`,
+				title: `${statusConfig[env.STATUS].emoji}  ${titleText}`,
 				description: await createDescription(env.SUITE, targetText),
 				color: statusConfig[env.STATUS].color,
 			},

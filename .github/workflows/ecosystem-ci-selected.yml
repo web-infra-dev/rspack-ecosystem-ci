@@ -126,7 +126,9 @@ jobs:
           REF_TYPE: ${{ inputs.refType }}
           REF: ${{ inputs.ref }}
           REPO: ${{ inputs.repo }}
-          SUITE: "${{ matrix.suite }} ${{ inputs.suiteRefType }} ${{ inputs.suiteRef }}"
+          SUITE: ${{ matrix.suite }}
+          SUITE_REF_TYPE: ${{ inputs.suiteRefType }}
+          SUITE_REF: ${{ inputs.suiteRef }}
           STATUS: ${{ job.status }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

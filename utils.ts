@@ -513,6 +513,10 @@ export function parseMajorVersion(version: string) {
 	return parseInt(version.split('.', 1)[0], 10)
 }
 
-export function ignoreString(str: string | undefined, ignored: string) {
+function ignoreString(str: string | undefined, ignored: string) {
 	return str !== ignored ? str : undefined
+}
+
+export function ignorePrecoded(str: string | undefined) {
+	return ignoreString(str, 'precoded')
 }
