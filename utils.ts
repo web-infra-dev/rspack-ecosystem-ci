@@ -513,6 +513,6 @@ export function parseMajorVersion(version: string) {
 	return parseInt(version.split('.', 1)[0], 10)
 }
 
-export function ignoreDash(str: string | undefined) {
-	return str !== '-' ? str : undefined
+export function ignoreString(str: string | undefined, ignored: string) {
+	return str !== ignored ? str : undefined
 }

@@ -48,7 +48,7 @@ on:
         description: "suite ref to use"
         required: false
         type: string
-        default: "-"
+        default: "precoded"
 
 jobs:
   init:

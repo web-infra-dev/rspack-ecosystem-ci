@@ -10,7 +10,7 @@ import {
 	bisectRspack,
 	parseRspackMajor,
 	parseMajorVersion,
-	ignoreDash,
+	ignoreString,
 } from './utils'
 import { CommandOptions, RunOptions } from './types'
 
@@ -48,9 +48,9 @@ cli
 			release: options.release,
 			verify: options.verify,
 			skipGit: false,
-			suiteBranch: ignoreDash(options.suiteBranch),
-			suiteTag: ignoreDash(options.suiteTag),
-			suiteCommit: ignoreDash(options.suiteCommit),
+			suiteBranch: ignoreString(options.suiteBranch, 'precoded'),
+			suiteTag: ignoreString(options.suiteTag, 'precoded'),
+			suiteCommit: ignoreString(options.suiteCommit, 'precoded'),
 		}
 		for (const suite of suitesToRun) {
 			await run(suite, runOptions)
@@ -98,9 +98,9 @@ cli
 			rspackPath,
 			rspackMajor: parseRspackMajor(rspackPath),
 			workspace,
-			suiteBranch: ignoreDash(options.suiteBranch),
-			suiteTag: ignoreDash(options.suiteTag),
-			suiteCommit: ignoreDash(options.suiteCommit),
+			suiteBranch: ignoreString(options.suiteBranch, 'precoded'),
+			suiteTag: ignoreString(options.suiteTag, 'precoded'),
+			suiteCommit: ignoreString(options.suiteCommit, 'precoded'),
 		}
 		for (const suite of suitesToRun) {
 			await run(suite, runOptions)
@@ -146,9 +146,9 @@ cli
 						rspackPath,
 						rspackMajor: parseRspackMajor(rspackPath),
 						workspace,
-						suiteBranch: ignoreDash(options.suiteBranch),
-						suiteTag: ignoreDash(options.suiteTag),
-						suiteCommit: ignoreDash(options.suiteCommit),
+						suiteBranch: ignoreString(options.suiteBranch, 'precoded'),
+						suiteTag: ignoreString(options.suiteTag, 'precoded'),
+						suiteCommit: ignoreString(options.suiteCommit, 'precoded'),
 					})
 				}
 				isFirstRun = false
