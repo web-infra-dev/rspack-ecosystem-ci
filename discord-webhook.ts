@@ -66,9 +66,9 @@ async function run() {
 	const targetText = createTargetText(refType, env.REF, permRef, env.REPO)
 	const suiteRefType = ignorePrecoded(env.SUITE_REF_TYPE)
 	const suiteRef = ignorePrecoded(env.SUITE_REF)
-	const titleText = `${env.SUITE}${suiteRefType ? ` ${suiteRefType}` : ''}${
-		suiteRef ? ` ${suiteRef}` : ''
-	}`
+	const titlePostfix =
+		suiteRefType && suiteRef ? ` (${suiteRefType}: ${suiteRef})` : ''
+	const titleText = `${env.SUITE}${titlePostfix}`
 
 	const webhookContent = {
 		username: `rspack-ecosystem-ci (${env.WORKFLOW_NAME})`,
