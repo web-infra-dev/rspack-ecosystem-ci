@@ -11,10 +11,6 @@
 			"directory": "packages/rspack"
 		},
 		{
-			"name": "@rspack/dev-client",
-			"directory": "packages/rspack-dev-client"
-		},
-		{
 			"name": "@rspack/dev-server",
 			"directory": "packages/rspack-dev-server"
 		},
