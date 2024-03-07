@@ -152,7 +152,7 @@ jobs:
             ${result.map(r => `| [${r.suite}](${r.link}) | ${conclusionEmoji[r.conclusion]} ${r.conclusion} |`).join("\n")}
             `
 
-            await github.rest.issues.updateComment({
+            await github.rest.repos.createCommitComment({
               commit_sha: context.payload.inputs.commitSHA,
               owner: context.repo.owner,
               repo: 'rspack',
