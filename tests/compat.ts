@@ -6,6 +6,6 @@ export async function test(options: RunOptions) {
 		...options,
 		repo: 'web-infra-dev/rspack-compat',
 		branch: 'main',
-		test: ['build'],
+		test: ['build', 'test'],
 	})
 }
