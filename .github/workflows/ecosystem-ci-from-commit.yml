@@ -13,11 +13,6 @@ on:
         description: "commit sha"
         required: true
         type: string
-      branchName:
-        description: "rspack branch to use"
-        required: true
-        type: string
-        default: "main"
       repo:
         description: "rspack repository to use"
         required: true
@@ -69,7 +64,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
-          --branch ${{ inputs.branchName }}
+          --commit ${{ inputs.commitSHA }}
           --repo ${{ inputs.repo }}
           --suite-${{ inputs.suiteRefType }} ${{ inputs.suiteRef }}
           ${{ inputs.suite }}
@@ -101,7 +96,7 @@ jobs:
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
-          --branch ${{ inputs.branchName }}
+          --commit ${{ inputs.commitSHA }}
           --repo ${{ inputs.repo }}
           ${{ matrix.suite }}
 
