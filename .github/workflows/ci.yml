@@ -9,8 +9,44 @@ on:
       - main
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: corepack enable
+      - run: pnpm --version
+      - name: Checkout Rspack repo
+        uses: actions/checkout@v4
+        with:
+          repository: web-infra-dev/rspack
+          path: workspace/rspack
+      - name: Build Rspack
+        run: |
+          cd workspace/rspack
+          pnpm i --frozen-lockfile
+          pnpm run build:binding:release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bindings-x86_64-unknown-linux-gnu
+          path: workspace/rspack/crates/node_binding/*.node
+
+  ci:
+    needs: build
+    runs-on: ubuntu-latest
+    if: "inputs.suite == '-'"
+    strategy:
+      matrix:
+        suite:
+          - _selftest
+          - modernjs
+          - nx
+          - rspress
+          - rsbuild
+          - compat
+          - examples
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -18,15 +54,28 @@ jobs:
           node-version: 18
       - run: corepack enable
       - run: pnpm --version
-      - name: install
-        run: pnpm install --frozen-lockfile --prefer-offline
-      - name: format
-        run: pnpm format
-      - name: lint
-        run: pnpm run lint
-      # - name: audit
-      #   if: (${{ success() }} || ${{ failure() }})
-      #   run: pnpm audit
-      - name: test
-        if: (${{ success() }} || ${{ failure() }})
-        run: pnpm test:self
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+        continue-on-error: true
+      - name: Checkout Rspack repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repo }}
+          path: workspace/rspack
+      - uses: actions/download-artifact@v4
+        with:
+          name: bindings-x86_64-unknown-linux-gnu
+          path: workspace/rspack/crates/node_binding/*.node
+      - run: |
+          cd workspace/rspack
+          pnpm i --frozen-lockfile
+          pnpm run build:js
+      - run: corepack enable
+      - run: pnpm --version
+      - run: pnpm i --frozen-lockfile
+      - run: >-
+          pnpm tsx ecosystem-ci.ts
+          run-suites
+          --repo ${{ inputs.repo }}
+          ${{ matrix.suite }}
