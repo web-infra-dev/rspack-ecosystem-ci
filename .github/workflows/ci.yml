@@ -12,6 +12,8 @@ jobs:
   build-binding:
     name: Build Rspack Binding
     uses: ./.github/workflows/build-rspack-binding.yaml
+    with:
+      ref: 822698fc11945278d4c726fc1e596a81af110b10
 
   ci:
     needs: build-binding
@@ -44,6 +46,7 @@ jobs:
         with:
           repository: web-infra-dev/rspack
           path: workspace/rspack
+          ref: 822698fc11945278d4c726fc1e596a81af110b10
       - uses: actions/download-artifact@v4
         with:
           name: binding-linux-x64-gnu
