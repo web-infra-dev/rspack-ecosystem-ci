@@ -14,6 +14,7 @@ import {
 import { detect, AGENTS, Agent, getCommand } from '@antfu/ni'
 import actionsCore from '@actions/core'
 import assert from 'assert'
+import { ActionLocalCache } from './action-local-cache'
 
 const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
@@ -333,6 +334,9 @@ export async function getPermanentRef() {
 }
 
 export async function buildRspack({ verify = false }) {
+	const rustCache = new ActionLocalCache('workspace/rspack/target')
+	rustCache.restore()
+
 	cd(rspackPath)
 	const frozenInstall = getCommand('pnpm', 'frozen')
 	const runBuildBinding = getCommand('pnpm', 'run', ['build:binding:release'])

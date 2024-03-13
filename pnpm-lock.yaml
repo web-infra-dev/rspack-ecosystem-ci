@@ -4,6 +4,9 @@ dependencies:
   '@actions/core':
     specifier: ^1.10.0
     version: 1.10.0
+  '@actions/io':
+    specifier: ^1.1.3
+    version: 1.1.3
   cac:
     specifier: ^6.7.14
     version: 6.7.14
@@ -71,6 +74,10 @@ packages:
     resolution: {integrity: sha512-PIXiMVtz6VvyaRsGY268qvj57hXQEpsYogYOu2nrQhlf+XCGmZstmuZBbAybUl1nQGnvS1k1eEsQ69ZoD7xlSw==}
     dependencies:
       tunnel: 0.0.6
+    dev: false
+
+  /@actions/io@1.1.3:
+    resolution: {integrity: sha512-wi9JjgKLYS7U/z8PPbco+PvTb/nRWjeoFlJ1Qer83k/3C5PHQi28hiVdeE2kHXmIL99mQFawx8qt/JPjZilJ8Q==}
     dev: false
 
   /@antfu/ni@0.20.0:
