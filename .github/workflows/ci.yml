@@ -9,33 +9,13 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
-      - name: Checkout Rspack repo
-        uses: actions/checkout@v4
-        with:
-          repository: web-infra-dev/rspack
-          path: workspace/rspack
-      - name: Build Rspack
-        run: |
-          cd workspace/rspack
-          pnpm i --frozen-lockfile
-          pnpm run build:binding:release
-      - uses: actions/upload-artifact@v4
-        with:
-          name: bindings-x86_64-unknown-linux-gnu
-          path: workspace/rspack/crates/node_binding/*.node
+  build-binding:
+    name: Build Rspack Binding
+    uses: ./.github/workflows/build-rspack-binding.yaml
 
   ci:
-    needs: build
+    needs: build-binding
     runs-on: ubuntu-latest
-    if: "inputs.suite == '-'"
     strategy:
       matrix:
         suite:
