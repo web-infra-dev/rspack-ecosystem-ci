@@ -47,17 +47,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: binding-linux-x64-gnu
-          path: workspace/rspack/crates/node_binding/
-      - name: Move artifacts
-        run: node scripts/build-npm.cjs
-      - name: Show binding packages
-        run: ls -R npm
+          path: workspace/rspack/crates/node_binding
+      - name: Show restored binding
+        shell: bash
+        run: ls -lah workspace/rspack/crates/node_binding/*.node
       - run: |
           cd workspace/rspack
-          pnpm i --frozen-lockfile
+          pnpm i
           pnpm run build:js
 
-      - run: pnpm i --frozen-lockfile
+      - run: pnpm i
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
