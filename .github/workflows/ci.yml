@@ -38,6 +38,7 @@ jobs:
         with:
           deno-version: v1.x
         continue-on-error: true
+
       - name: Checkout Rspack repo
         uses: actions/checkout@v4
         with:
@@ -45,14 +46,17 @@ jobs:
           path: workspace/rspack
       - uses: actions/download-artifact@v4
         with:
-          name: bindings-x86_64-unknown-linux-gnu
-          path: workspace/rspack/crates/node_binding/*.node
+          name: binding-linux-x64-gnu
+          path: workspace/rspack/crates/node_binding/
+      - name: Move artifacts
+        run: node scripts/build-npm.cjs
+      - name: Show binding packages
+        run: ls -R npm
       - run: |
           cd workspace/rspack
           pnpm i --frozen-lockfile
           pnpm run build:js
-      - run: corepack enable
-      - run: pnpm --version
+
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
