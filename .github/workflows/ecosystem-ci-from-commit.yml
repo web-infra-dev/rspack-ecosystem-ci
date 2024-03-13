@@ -47,13 +47,8 @@ on:
         default: "precoded"
 
 jobs:
-  get-runner-labels:
-    name: Get Runner Labels
-    uses: ./.github/workflows/get-runner-labels.yml
-
   execute-selected-suite:
-    needs: [get-runner-labels]
-    runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+    runs-on: ubuntu-latest
     if: "inputs.suite != '-'"
     steps:
       - uses: actions/checkout@v3
@@ -75,8 +70,7 @@ jobs:
           ${{ inputs.suite }}
 
   execute-all:
-    needs: [get-runner-labels]
-    runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+    runs-on: ubuntu-latest
     if: "inputs.suite == '-'"
     strategy:
       matrix:
