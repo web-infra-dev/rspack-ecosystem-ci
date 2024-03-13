@@ -333,10 +333,7 @@ export async function getPermanentRef() {
 	}
 }
 
-export async function buildRspack({ verify = false }) {
-	const rustCache = new ActionLocalCache('workspace/rspack/target')
-	rustCache.restore()
-
+async function buildRspackInternal({ verify = false }) {
 	cd(rspackPath)
 	const frozenInstall = getCommand('pnpm', 'frozen')
 	const runBuildBinding = getCommand('pnpm', 'run', ['build:binding:release'])
@@ -352,6 +349,13 @@ export async function buildRspack({ verify = false }) {
 		const runTest = getCommand('pnpm', 'run', ['test:js'])
 		await $`${runTest}`
 	}
+}
+
+export const buildRspack: typeof buildRspackInternal = async (...args) => {
+	const rustCache = new ActionLocalCache('workspace/rspack/target')
+	rustCache.restore()
+	await buildRspackInternal(...args)
+	rustCache.save()
 }
 
 export async function bisectRspack(
