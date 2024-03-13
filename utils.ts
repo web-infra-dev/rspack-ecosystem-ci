@@ -352,7 +352,7 @@ async function buildRspackInternal({ verify = false }) {
 }
 
 export const buildRspack: typeof buildRspackInternal = async (...args) => {
-	const rustCache = new ActionLocalCache('workspace/rspack/target')
+	const rustCache = new ActionLocalCache('workspace/rspack/target', 'copy')
 	rustCache.restore()
 	await buildRspackInternal(...args)
 	rustCache.save()
