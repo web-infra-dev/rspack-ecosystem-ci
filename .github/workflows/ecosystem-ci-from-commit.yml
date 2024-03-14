@@ -58,6 +58,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-rspack-binding
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.commitSHA }}
 
   execute-selected-suite:
     runs-on: ubuntu-latest
@@ -66,6 +69,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
+        with:
+          ref: ${{ inputs.commitSHA }}
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x

@@ -1,14 +1,18 @@
 name: 'Build Rspack'
 description: 'Checkout, download rspack binding, and build rspack js'
 inputs:
-  rspack-repository:
+  repository:
     description: 'The rspack repository to use'
     required: true
     default: 'web-infra-dev/rspack'
-  rspack-path:
+  path:
     description: 'Destination path to the rspack repository'
     required: true
     default: 'workspace/rspack'
+  ref:
+    description: 'The branch, tag or SHA to checkout'
+    required: true
+    default: 'main'
   node-version:
     description: 'The version of Node.js to set up'
     required: true
@@ -33,18 +37,19 @@ runs:
     - name: Checkout Rspack repo
       uses: actions/checkout@v4
       with:
-        repository: ${{ inputs.rspack-repository }}
-        path: ${{ inputs.rspack-path }}
+        repository: ${{ inputs.repository }}
+        path: ${{ inputs.path }}
+        ref: ${{ inputs.ref }}
     - uses: actions/download-artifact@v4
       with:
         name: binding-linux-x64-gnu
-        path: ${{ inputs.rspack-path }}/npm/linux-x64-gnu
+        path: ${{ inputs.path }}/npm/linux-x64-gnu
     - name: Show restored binding
       shell: bash
-      run: ls -lah ${{ inputs.rspack-path }}/npm/linux-x64-gnu/*.node
+      run: ls -lah ${{ inputs.path }}/npm/linux-x64-gnu/*.node
     - name: Build Rspack JS
       shell: bash
       run: |
-        cd ${{ inputs.rspack-path }}
+        cd ${{ inputs.path }}
         pnpm i
         pnpm run build:js

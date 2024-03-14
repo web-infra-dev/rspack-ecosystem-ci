@@ -1,14 +1,18 @@
 name: 'Prepare Rspack Binding'
 description: 'Checkout, build, and upload rspack native bindings'
 inputs:
-  rspack-repository:
+  repository:
     description: 'The rspack repository to use'
     required: true
     default: 'web-infra-dev/rspack'
-  rspack-path:
-    description: 'Destination path to the rspack repository'
+  path:
+    description: 'Destination path to clone'
     required: true
     default: 'workspace/rspack'
+  ref:
+    description: 'The branch, tag or SHA to checkout'
+    required: true
+    default: 'main'
   node-version:
     description: 'The version of Node.js to set up'
     required: true
@@ -22,35 +26,36 @@ runs:
     - name: Checkout Rspack repo
       uses: actions/checkout@v4
       with:
-        repository: ${{ inputs.rspack-repository }}
-        path: ${{ inputs.rspack-path }}
+        repository: ${{ inputs.repository }}
+        path: ${{ inputs.path }}
+        ref: ${{ inputs.ref }}
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
     - shell: bash
       run: |
-        cd ${{ inputs.rspack-path }}
+        cd ${{ inputs.path }}
         corepack enable
     - shell: bash
       run: |
-        cd ${{ inputs.rspack-path }}
+        cd ${{ inputs.path }}
         pnpm --version
     - id: rust-cache
       uses: MasterworksIO/action-local-cache@2
       with:
-        path: '${{ inputs.rspack-path }}/target'
+        path: '${{ inputs.path }}/target'
         key: ${{ hashFiles('**/Cargo.lock') }}
     - name: Show Rust Cache
       if: steps.rust-cache.outputs.cache-hit == 'true'
       shell: bash
-      run: ls -lah ${{ inputs.rspack-path }}/target
+      run: ls -lah ${{ inputs.path }}/target
     - name: Build Rspack
       shell: bash
       run: |
-        cd ${{ inputs.rspack-path }}
+        cd ${{ inputs.path }}
         pnpm i --frozen-lockfile
         pnpm run build:binding:release
     - uses: actions/upload-artifact@v4
       with:
         name: binding-linux-x64-gnu
-        path: ${{ inputs.rspack-path }}/crates/node_binding/*.node
+        path: ${{ inputs.path }}/crates/node_binding/*.node
