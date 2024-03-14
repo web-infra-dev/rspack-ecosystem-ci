@@ -35,9 +35,15 @@ runs:
       run: |
         cd ${{ inputs.rspack-path }}
         pnpm --version
-    - uses: MasterworksIO/action-local-cache@2
+    - id: rust-cache
+      uses: MasterworksIO/action-local-cache@2
       with:
         path: '${{ inputs.rspack-path }}/target'
+        key: ${{ hashFiles('**/Cargo.lock') }}
+    - name: Show Rust Cache
+      if: steps.rust-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: ls -lah ${{ inputs.rspack-path }}/target
     - name: Build Rspack
       shell: bash
       run: |
