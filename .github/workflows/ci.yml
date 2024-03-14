@@ -50,10 +50,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: binding-linux-x64-gnu
-          path: workspace/rspack/crates/node_binding
+          path: workspace/rspack/npm/linux-x64-gnu
       - name: Show restored binding
         shell: bash
-        run: ls -lah workspace/rspack/crates/node_binding/*.node
+        run: ls -lah workspace/rspack/npm/linux-x64-gnu/*.node
       - run: |
           cd workspace/rspack
           pnpm i
