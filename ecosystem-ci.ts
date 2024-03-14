@@ -92,6 +92,7 @@ cli
 	.action(async (suites, options: CommandOptions) => {
 		const { root, rspackPath, workspace } = await setupEnvironment()
 		const suitesToRun = getSuitesToRun(suites, root)
+		console.log('------ suites --------', suites)
 		const runOptions: RunOptions = {
 			...options,
 			root,
