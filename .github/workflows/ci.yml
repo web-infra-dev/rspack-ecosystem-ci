@@ -9,24 +9,46 @@ on:
       - main
 
 jobs:
-  ci:
-    runs-on: ubuntu-latest
+  get-runner-labels:
+    name: Get Runner Labels
+    uses: ./.github/workflows/get-runner-labels.yml
+
+  prepare-binding:
+    name: Prepare Rspack Binding
+    needs: get-runner-labels
+    runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-rspack-binding
+
+  ci:
+    needs: [get-runner-labels, prepare-binding]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        suite:
+          - _selftest
+          - modernjs
+          - nx
+          - rspress
+          - rsbuild
+          - compat
+          - examples
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rspack
+      - uses: denoland/setup-deno@v1
         with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
-      - name: install
+          deno-version: v1.x
+        continue-on-error: true
+      - name: Install
         run: pnpm install --frozen-lockfile --prefer-offline
-      - name: format
+      - name: Format
         run: pnpm format
-      - name: lint
-        run: pnpm run lint
-      # - name: audit
-      #   if: (${{ success() }} || ${{ failure() }})
-      #   run: pnpm audit
-      - name: test
-        if: (${{ success() }} || ${{ failure() }})
-        run: pnpm test:self
+      - name: Lint
+        run: pnpm lint
+      - run: >-
+          pnpm tsx ecosystem-ci.ts
+          run-suites
+          ${{ matrix.suite }}
