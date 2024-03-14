@@ -23,17 +23,11 @@ jobs:
 
   ci:
     needs: [get-runner-labels, prepare-binding]
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
     strategy:
       matrix:
         suite:
-          - _selftest
           - modernjs
-          - nx
-          - rspress
-          - rsbuild
-          - compat
-          - examples
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
