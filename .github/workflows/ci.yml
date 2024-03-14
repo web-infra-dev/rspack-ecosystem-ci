@@ -21,11 +21,11 @@ jobs:
       - name: Checkout Rspack repo
         uses: actions/checkout@v4
         with:
-          repository: 'web-infra-dev/rspack'
+          repository: "web-infra-dev/rspack"
       - name: Cache for Rspack Rust
         uses: MasterworksIO/action-local-cache@2
         with:
-          path: './target/'
+          path: "./target/"
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -82,7 +82,12 @@ jobs:
           cd workspace/rspack
           pnpm i
           pnpm run build:js
-      - run: pnpm i
+      - name: Install
+        run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Format
+        run: pnpm format
+      - name: Lint
+        run: pnpm lint
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
