@@ -38,10 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: v1.x
-        continue-on-error: true
       - name: Install
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Format

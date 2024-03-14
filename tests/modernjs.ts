@@ -1,4 +1,3 @@
-import * as os from 'os'
 import { runInRepo, cd, $ } from '../utils'
 import { RunOptions } from '../types'
 
@@ -12,6 +11,6 @@ export async function test(options: RunOptions) {
 			await $`pnpm playwright install --with-deps chromium`
 			cd('../../../')
 		},
-		test: [`e2e:rspack --workers ${os.cpus().length}`],
+		test: ['e2e:rspack'],
 	})
 }
