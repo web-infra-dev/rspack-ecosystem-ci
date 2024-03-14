@@ -8,7 +8,7 @@ export async function test(options: RunOptions) {
 		branch: process.env.RSBUILD_REF ?? 'main',
 		beforeTest: async () => {
 			cd('./e2e')
-			await $`pnpm playwright install`
+			await $`pnpm playwright install --with-deps`
 			cd('..')
 		},
 		test: ['e2e:rspack'],

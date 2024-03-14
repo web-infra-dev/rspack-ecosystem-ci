@@ -8,7 +8,7 @@ export async function test(options: RunOptions) {
 		branch: process.env.MODERN_REF ?? 'main',
 		beforeTest: async () => {
 			cd('tests/e2e/builder')
-			await $`pnpm playwright install chromium`
+			await $`pnpm playwright install --with-deps chromium`
 			cd('../../../')
 		},
 		test: ['test:rspack'],
