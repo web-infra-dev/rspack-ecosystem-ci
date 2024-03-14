@@ -27,7 +27,13 @@ jobs:
     strategy:
       matrix:
         suite:
+          - _selftest
           - modernjs
+          - nx
+          - rspress
+          - rsbuild
+          - compat
+          - examples
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
