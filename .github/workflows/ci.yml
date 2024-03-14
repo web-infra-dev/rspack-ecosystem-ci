@@ -15,6 +15,17 @@ jobs:
   ci:
     needs: [get-runner-labels]
     runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+    strategy:
+      matrix:
+        suite:
+          - _selftest
+          - modernjs
+          - nx
+          - rspress
+          - rsbuild
+          - compat
+          - examples
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -31,6 +42,6 @@ jobs:
       # - name: audit
       #   if: (${{ success() }} || ${{ failure() }})
       #   run: pnpm audit
-      - name: test
-        if: (${{ success() }} || ${{ failure() }})
-        run: pnpm test:self
+      - run: >-
+          pnpm tsx ecosystem-ci.ts
+          ${{ matrix.suite }}
