@@ -20,16 +20,21 @@ jobs:
     needs: [get-runner-labels]
     runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
       - name: Checkout Rspack repo
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.ref }}
+      - name: Local cache for Rspack Rust
+        uses: MasterworksIO/action-local-cache@2
+        with:
+          path: './target/'
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: corepack enable
+      - run: pnpm --version
       - name: Build Rspack
         run: |
           pnpm i --frozen-lockfile
