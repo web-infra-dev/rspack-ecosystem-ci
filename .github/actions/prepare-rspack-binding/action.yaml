@@ -1,0 +1,50 @@
+name: 'Prepare Rspack Binding'
+description: 'Checkout, build, and upload rspack native bindings'
+inputs:
+  rspack-repository:
+    description: 'The rspack repository to use'
+    required: true
+    default: 'web-infra-dev/rspack'
+  rspack-path:
+    description: 'Destination path to the rspack repository'
+    required: true
+    default: 'workspace/rspack'
+  node-version:
+    description: 'The version of Node.js to set up'
+    required: true
+    default: '18'
+outputs:
+  artifact-name:
+    description: 'The name of the uploaded artifact'
+runs:
+  using: composite
+  steps:
+    - name: Checkout Rspack repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.rspack-repository }}
+        path: ${{ inputs.rspack-path }}
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+    - shell: bash
+      run: |
+        cd ${{ inputs.rspack-path }}
+        corepack enable
+    - shell: bash
+      run: |
+        cd ${{ inputs.rspack-path }}
+        pnpm --version
+    - uses: MasterworksIO/action-local-cache@2
+      with:
+        path: '${{ inputs.rspack-path }}/target'
+    - name: Build Rspack
+      shell: bash
+      run: |
+        cd ${{ inputs.rspack-path }}
+        pnpm i --frozen-lockfile
+        pnpm run build:binding:release
+    - uses: actions/upload-artifact@v4
+      with:
+        name: binding-linux-x64-gnu
+        path: ${{ inputs.rspack-path }}/crates/node_binding/*.node

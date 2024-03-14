@@ -18,27 +18,8 @@ jobs:
     needs: get-runner-labels
     runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
     steps:
-      - name: Checkout Rspack repo
-        uses: actions/checkout@v4
-        with:
-          repository: "web-infra-dev/rspack"
-      - name: Cache for Rspack Rust
-        uses: MasterworksIO/action-local-cache@2
-        with:
-          path: "./target/"
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
-      - name: Build Rspack
-        run: |
-          pnpm i --frozen-lockfile
-          pnpm run build:binding:release
-      - uses: actions/upload-artifact@v4
-        with:
-          name: binding-linux-x64-gnu
-          path: crates/node_binding/*.node
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-rspack-binding
 
   ci:
     needs: [get-runner-labels, prepare-binding]
@@ -55,33 +36,12 @@ jobs:
           - examples
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rspack
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
         continue-on-error: true
-      - name: Checkout Rspack repo
-        uses: actions/checkout@v4
-        with:
-          repository: web-infra-dev/rspack
-          path: workspace/rspack
-      - uses: actions/download-artifact@v4
-        with:
-          name: binding-linux-x64-gnu
-          path: workspace/rspack/npm/linux-x64-gnu
-      - name: Show restored binding
-        shell: bash
-        run: ls -lah workspace/rspack/npm/linux-x64-gnu/*.node
-      - name: Build Rspack JS
-        run: |
-          cd workspace/rspack
-          pnpm i
-          pnpm run build:js
       - name: Install
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Format
