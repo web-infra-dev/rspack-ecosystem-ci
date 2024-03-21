@@ -15,16 +15,8 @@
 			"directory": "packages/rspack-dev-server"
 		},
 		{
-			"name": "@rspack/plugin-html",
-			"directory": "packages/rspack-plugin-html"
-		},
-		{
 			"name": "@rspack/plugin-minify",
 			"directory": "packages/rspack-plugin-minify"
-		},
-		{
-			"name": "@rspack/plugin-node-polyfill",
-			"directory": "packages/rspack-plugin-node-polyfill"
 		},
 		{
 			"name": "@rspack/plugin-react-refresh",
