@@ -27,7 +27,12 @@ runs:
       with:
         node-version: 18
     - shell: bash
-      run: corepack enable
+      name: Install package manager
+      run: |
+        npm install -g corepack@latest
+        echo "Corepack version: $(corepack --version)"
+        corepack enable
+
     - shell: bash
       run: pnpm --version
     - name: Checkout Rspack repo

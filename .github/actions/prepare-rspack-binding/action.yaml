@@ -33,8 +33,11 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
     - shell: bash
+      name: Install package manager
       run: |
         cd ${{ inputs.path }}
+        npm install -g corepack@latest
+        echo "Corepack version: $(corepack --version)"
         corepack enable
     - shell: bash
       run: |
