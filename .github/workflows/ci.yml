@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - suite: modernjs
-            os: "test"
+            os: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
           - suite: _selftest
             os: ubuntu-latest
           - suite: nx
