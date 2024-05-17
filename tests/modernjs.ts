@@ -1,3 +1,4 @@
+import os from 'node:os'
 import { runInRepo, cd, $ } from '../utils'
 import { RunOptions } from '../types'
 
@@ -14,9 +15,9 @@ export async function test(options: RunOptions) {
 		test: [
 			async () => {
 				cd('tests')
-				await $`pnpm test:builder:rspack`
-				await $`pnpm test:framework`
-				await $`pnpm test:garfish:rspack`
+				await $`npm run test:builder:rspack`
+				await $`npm run test:framework -- --maxWorkers=${os.cpus().length}`
+				await $`npm run test:garfish:rspack`
 			},
 		],
 	})
