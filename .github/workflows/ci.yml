@@ -48,8 +48,10 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Format
+        if: matrix.suite == '_selftest'
         run: pnpm format
       - name: Lint
+        if: matrix.suite == '_selftest'
         run: pnpm lint
       - run: >-
           pnpm tsx ecosystem-ci.ts

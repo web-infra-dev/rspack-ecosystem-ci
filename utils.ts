@@ -5,7 +5,6 @@ import { execaCommand } from 'execa'
 import {
 	EnvironmentData,
 	Overrides,
-	ProcessEnv,
 	RepoOptions,
 	RunOptions,
 	Task,
@@ -19,7 +18,7 @@ const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
 let rspackPath: string
 let cwd: string
-let env: ProcessEnv
+let env: NodeJS.ProcessEnv
 
 export function cd(dir: string) {
 	cwd = path.resolve(cwd, dir)
@@ -32,6 +31,7 @@ export async function $(literals: TemplateStringsArray, ...values: any[]) {
 		'',
 	)
 
+	const start = Date.now()
 	if (isGitHubActions) {
 		actionsCore.startGroup(`${cwd} $> ${cmd}`)
 	} else {
@@ -50,6 +50,8 @@ export async function $(literals: TemplateStringsArray, ...values: any[]) {
 
 	if (isGitHubActions) {
 		actionsCore.endGroup()
+		const cost = Math.ceil((Date.now() - start) / 1000)
+		console.log(`Cost for \`${cmd}\`: ${cost} s`)
 	}
 
 	return result.stdout

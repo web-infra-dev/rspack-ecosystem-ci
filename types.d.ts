@@ -5,7 +5,7 @@ export interface EnvironmentData {
 	workspace: string
 	rspackPath: string
 	cwd: string
-	env: ProcessEnv
+	env: NodeJS.ProcessEnv
 }
 
 export interface RunOptions {
@@ -54,8 +54,4 @@ export interface RepoOptions {
 
 export interface Overrides {
 	[key: string]: string | boolean
-}
-
-export interface ProcessEnv {
-	[key: string]: string | undefined
 }
