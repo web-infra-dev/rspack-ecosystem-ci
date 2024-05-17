@@ -32,6 +32,7 @@ export async function $(literals: TemplateStringsArray, ...values: any[]) {
 		'',
 	)
 
+	const start = Date.now()
 	if (isGitHubActions) {
 		actionsCore.startGroup(`${cwd} $> ${cmd}`)
 	} else {
@@ -50,6 +51,8 @@ export async function $(literals: TemplateStringsArray, ...values: any[]) {
 
 	if (isGitHubActions) {
 		actionsCore.endGroup()
+		const cost = Math.ceil((Date.now() - start) / 1000)
+		console.log(`Cost for \`${cmd}\`: ${cost} s`)
 	}
 
 	return result.stdout
