@@ -109,7 +109,6 @@ jobs:
           ${{ inputs.suite }}
 
   execute-all:
-    runs-on: ubuntu-latest
     needs: prepare-binding
     if: "inputs.suite == '-'"
     strategy:
@@ -128,6 +127,7 @@ jobs:
           - suite: examples
             os: ubuntu-latest
       fail-fast: false
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack

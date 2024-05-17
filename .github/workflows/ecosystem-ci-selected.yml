@@ -58,19 +58,35 @@ on:
         default: "precoded"
 
 jobs:
+  get-runner-labels:
+    name: Get Runner Labels
+    needs: create-comment
+    uses: ./.github/workflows/get-runner-labels.yml
+
+  prepare-binding:
+    name: Prepare Rspack Binding
+    needs: get-runner-labels
+    runs-on: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare-rspack-binding
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.suiteRef }}
+
   execute-selected-suite:
+    needs: prepare-binding
     runs-on: ubuntu-latest
     if: "inputs.suite != '-'"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rspack
         with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
+          ref: ${{ inputs.suiteRef }}
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
+          run-suites
           --${{ inputs.refType }} ${{ inputs.ref }}
           --repo ${{ inputs.repo }}
           --suite-${{ inputs.suiteRefType }} ${{ inputs.suiteRef }}
@@ -90,28 +106,34 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   execute-all:
-    runs-on: ubuntu-latest
+    needs: prepare-binding
     if: "inputs.suite == '-'"
     strategy:
       matrix:
-        suite:
-          - modernjs
-          - nx
-          - rspress
-          - rsbuild
-          - compat
-          - examples
+        include:
+          - suite: modernjs
+            os: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+          - suite: nx
+            os: ubuntu-latest
+          - suite: rspress
+            os: ubuntu-latest
+          - suite: rsbuild
+            os: ubuntu-latest
+          - suite: compat
+            os: ubuntu-latest
+          - suite: examples
+            os: ubuntu-latest
       fail-fast: false
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rspack
         with:
-          node-version: 18
-      - run: corepack enable
-      - run: pnpm --version
+          ref: ${{ inputs.suiteRef }}
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
+          run-suites
           --${{ inputs.refType }} ${{ inputs.ref }}
           --repo ${{ inputs.repo }}
           ${{ matrix.suite }}
