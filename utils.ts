@@ -5,7 +5,6 @@ import { execaCommand } from 'execa'
 import {
 	EnvironmentData,
 	Overrides,
-	ProcessEnv,
 	RepoOptions,
 	RunOptions,
 	Task,
@@ -19,7 +18,7 @@ const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
 let rspackPath: string
 let cwd: string
-let env: ProcessEnv
+let env: NodeJS.ProcessEnv
 
 export function cd(dir: string) {
 	cwd = path.resolve(cwd, dir)
