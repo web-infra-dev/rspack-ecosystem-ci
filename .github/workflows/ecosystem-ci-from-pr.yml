@@ -144,7 +144,7 @@ jobs:
 
   update-comment:
     runs-on: ubuntu-latest
-    needs: [execute-selected-suite, execute-all]
+    needs: [create-comment, execute-selected-suite, execute-all]
     if: always()
     steps:
       - uses: actions/github-script@v6
@@ -192,6 +192,6 @@ jobs:
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: 'rspack',
-              comment_id: ${{ needs.init.outputs.comment-id }},
+              comment_id: ${{ needs.create-comment.outputs.comment-id }},
               body
             })
