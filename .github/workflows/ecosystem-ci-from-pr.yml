@@ -100,6 +100,8 @@ jobs:
         with:
           ref: ${{ inputs.branchName }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
@@ -133,6 +135,8 @@ jobs:
         with:
           ref: ${{ inputs.branchName }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites

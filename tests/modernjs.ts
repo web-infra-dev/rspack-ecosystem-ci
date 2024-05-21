@@ -6,10 +6,6 @@ import { RunOptions } from '../types'
 
 const isGitHubActions = !!process.env.GITHUB_ACTIONS
 
-function getCurrentCommitSha() {
-	return execSync('git rev-parse HEAD').toString().trim()
-}
-
 export async function test(options: RunOptions) {
 	let nxCachePath: string
 	let nxCacheKey: string
@@ -20,11 +16,15 @@ export async function test(options: RunOptions) {
 		branch: process.env.MODERN_REF ?? 'main',
 		beforeInstall: async () => {
 			if (isGitHubActions) {
-				nxCachePath = join(
-					process.cwd(),
-					'workspace/modernjs/modern.js/.nx/cache',
-				)
-				nxCacheKey = 'modernjs-nx-' + getCurrentCommitSha()
+				const modernJsDir = join(process.cwd(), 'workspace/modernjs/modern.js')
+				nxCachePath = join(modernJsDir, '.nx/cache')
+				nxCacheKey =
+					'modernjs-nx-' +
+					execSync('git rev-parse HEAD', {
+						cwd: modernJsDir,
+					})
+						.toString()
+						.trim()
 				const restoreKeys = ['modernjs-nx-']
 				await cache.restoreCache([nxCachePath], nxCacheKey, restoreKeys)
 			}
