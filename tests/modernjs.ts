@@ -12,13 +12,6 @@ export async function test(options: RunOptions) {
 			await $`pnpm playwright install --with-deps chromium`
 			cd('../../../')
 		},
-		test: [
-			async () => {
-				cd('tests')
-				await $`npm run test:builder:rspack`
-				await $`npm run test:framework -- --maxWorkers=${os.cpus().length}`
-				await $`npm run test:garfish:rspack`
-			},
-		],
+		test: ['test:rspack'],
 	})
 }
