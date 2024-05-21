@@ -128,6 +128,7 @@ jobs:
             os: ubuntu-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    name: ${{ matrix.suite }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
