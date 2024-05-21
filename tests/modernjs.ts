@@ -16,6 +16,7 @@ export async function test(options: RunOptions) {
 		branch: process.env.MODERN_REF ?? 'main',
 		beforeInstall: async () => {
 			if (isGitHubActions) {
+				process.env.ACTIONS_RUNNER_DEBUG = 'true'
 				const modernJsDir = join(process.cwd(), 'workspace/modernjs/modern.js')
 				nxCachePath = join(modernJsDir, '.nx/cache')
 				nxCacheKey =
