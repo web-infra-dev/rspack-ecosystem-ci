@@ -103,8 +103,6 @@ jobs:
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
-          --branch ${{ inputs.branchName }}
-          --repo ${{ inputs.repo }}
           --suite-${{ inputs.suiteRefType }} ${{ inputs.suiteRef }}
           ${{ inputs.suite }}
 
@@ -137,8 +135,6 @@ jobs:
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
-          --branch ${{ inputs.branchName }}
-          --repo ${{ inputs.repo }}
           ${{ matrix.suite }}
 
   update-comment:
