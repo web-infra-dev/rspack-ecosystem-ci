@@ -16,7 +16,7 @@ export async function test(options: RunOptions) {
 			async () => {
 				cd('tests')
 				await $`npm run test:builder:rspack`
-				await $`npm run test:framework -- --maxWorkers=${os.cpus().length}`
+				await $`npm run test:framework -- --maxWorkers=50%`
 				await $`npm run test:garfish:rspack`
 			},
 		],
