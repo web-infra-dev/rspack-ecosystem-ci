@@ -14,8 +14,6 @@ import {
 } from './utils'
 import { CommandOptions, RunOptions } from './types'
 
-console.log('------- process.env ------', JSON.stringify(process.env))
-
 const cli = cac()
 cli
 	.command('[...suites]', 'build rspack and run selected suites')
