@@ -7,7 +7,7 @@ const nxCachePath = '.nx/cache'
 let nxCacheKey = 'modernjs-nx-'
 
 function getCurrentCommitSha() {
-	return execSync('git rev-parse HEAD').toString().trim();
+	return execSync('git rev-parse HEAD').toString().trim()
 }
 
 export async function test(options: RunOptions) {
@@ -16,7 +16,7 @@ export async function test(options: RunOptions) {
 		repo: 'web-infra-dev/modern.js',
 		branch: process.env.MODERN_REF ?? 'main',
 		beforeInstall: async () => {
-			nxCacheKey += getCurrentCommitSha();
+			nxCacheKey += getCurrentCommitSha()
 			const restoreKeys = ['modernjs-nx-']
 			await cache.restoreCache([nxCachePath], nxCacheKey, restoreKeys)
 		},
