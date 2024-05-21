@@ -21,8 +21,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-rspack-binding
 
+  env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set ACTIONS_CACHE_URL
+        run: |
+          echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}"
+
   ci:
-    needs: [get-runner-labels, prepare-binding]
+    needs: [env, get-runner-labels, prepare-binding]
     strategy:
       matrix:
         include:
