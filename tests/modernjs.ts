@@ -1,16 +1,17 @@
 import cache from '@actions/cache'
 import { execSync } from 'node:child_process'
+import { join } from 'node:path'
 import { runInRepo, cd, $ } from '../utils'
 import { RunOptions } from '../types'
-
-const nxCachePath = '.nx/cache'
-let nxCacheKey = 'modernjs-nx-'
 
 function getCurrentCommitSha() {
 	return execSync('git rev-parse HEAD').toString().trim()
 }
 
 export async function test(options: RunOptions) {
+	const nxCachePath = join(__dirname, 'workspace/modernjs/modern.js')
+	let nxCacheKey = 'modernjs-nx-'
+
 	await runInRepo({
 		...options,
 		repo: 'web-infra-dev/modern.js',
