@@ -103,8 +103,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
-        with:
-          ref: ${{ inputs.commitSHA }}
       - run: pnpm i --frozen-lockfile
       - run: >-
           pnpm tsx ecosystem-ci.ts
