@@ -21,15 +21,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-rspack-binding
 
-  env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: set ACTIONS_CACHE_URL
-        run: |
-          echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL}"
-
   ci:
-    needs: [env, get-runner-labels, prepare-binding]
+    needs: [get-runner-labels, prepare-binding]
     strategy:
       matrix:
         include:
@@ -61,6 +54,8 @@ jobs:
       - name: Lint
         if: matrix.suite == '_selftest'
         run: pnpm lint
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
