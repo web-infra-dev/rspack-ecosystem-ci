@@ -1,5 +1,4 @@
 import cache from '@actions/cache'
-import { execSync } from 'node:child_process'
 import { join } from 'node:path'
 import { runInRepo, cd, $ } from '../utils'
 import { RunOptions } from '../types'
@@ -16,18 +15,19 @@ export async function test(options: RunOptions) {
 		branch: process.env.MODERN_REF ?? 'main',
 		beforeInstall: async () => {
 			if (isGitHubActions) {
-				process.env.ACTIONS_RUNNER_DEBUG = 'true'
 				const modernJsDir = join(process.cwd(), 'workspace/modernjs/modern.js')
-				nxCachePath = join(modernJsDir, '.nx/cache')
+				nxCachePath = join(modernJsDir, '.nx/cache') + '/'
 				nxCacheKey =
-					'modernjs-nx-' +
-					execSync('git rev-parse HEAD', {
-						cwd: modernJsDir,
-					})
-						.toString()
-						.trim()
+					'modernjs-nx-' + (await $`git rev-parse HEAD`.toString().trim())
 				const restoreKeys = ['modernjs-nx-']
-				await cache.restoreCache([nxCachePath], nxCacheKey, restoreKeys)
+				const cacheHitKey = await cache.restoreCache(
+					[nxCachePath],
+					nxCacheKey,
+					restoreKeys,
+				)
+				if (cacheHitKey) {
+					await $`ls -lah ${nxCachePath}`
+				}
 			}
 		},
 		afterInstall: async () => {
