@@ -104,7 +104,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   execute-all:
-    needs: prepare-binding
+    needs: [get-runner-labels, prepare-binding]
     if: "inputs.suite == '-'"
     strategy:
       matrix:
@@ -123,6 +123,7 @@ jobs:
             os: ubuntu-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
+    name: execute-all (${{ matrix.suite }})
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
