@@ -1,4 +1,3 @@
-import os from 'node:os'
 import { runInRepo, cd, $ } from '../utils'
 import { RunOptions } from '../types'
 
@@ -12,13 +11,6 @@ export async function test(options: RunOptions) {
 			await $`pnpm playwright install --with-deps chromium`
 			cd('../../../')
 		},
-		test: [
-			async () => {
-				cd('tests')
-				await $`npm run test:builder:rspack`
-				await $`npm run test:framework -- --maxWorkers=50%`
-				await $`npm run test:garfish:rspack`
-			},
-		],
+		test: ['test:rspack'],
 	})
 }
