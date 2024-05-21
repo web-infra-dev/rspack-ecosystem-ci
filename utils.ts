@@ -221,6 +221,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		skipGit,
 		verify,
 		beforeInstall,
+		afterInstall,
 		beforeBuild,
 		beforeTest,
 	} = options
@@ -257,6 +258,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	}
 	const agent = options.agent
 	const beforeInstallCommand = toCommand(beforeInstall, agent)
+	const afterInstallCommand = toCommand(afterInstall, agent)
 	const beforeBuildCommand = toCommand(beforeBuild, agent)
 	const beforeTestCommand = toCommand(beforeTest, agent)
 	const buildCommand = toCommand(build, agent)
@@ -303,6 +305,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		}
 	}
 	await applyPackageOverrides(dir, pkg, overrides)
+	await afterInstallCommand?.(pkg.scripts)
 	await beforeBuildCommand?.(pkg.scripts)
 	await buildCommand?.(pkg.scripts)
 	if (test) {
