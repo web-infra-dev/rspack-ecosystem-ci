@@ -26,16 +26,18 @@ export async function test(options: RunOptions) {
 					restoreKeys,
 				)
 				if (cacheHitKey) {
+					console.log(`Cache hit for key: ${cacheHitKey}`);
 					await $`ls -lah .nx/cache`
 				} else {
-					console.log('Not hit cache')
+					console.log(`Cache miss for key: ${nxCacheKey}, proceeding without cache.`);
 				}
 			}
 		},
 		afterInstall: async () => {
 			if (isGitHubActions) {
+				console.log('Caching `.nx/cache` directory for future builds.');
 				await $`ls -lah .nx/cache`
-				await cache.saveCache([`${nxCachePath}/**`], nxCacheKey)
+				await cache.saveCache([nxCachePath], nxCacheKey)
 			}
 		},
 		beforeTest: async () => {
