@@ -277,32 +277,32 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		await testCommand?.(pkg.scripts)
 	}
 	const overrides = options.overrides || {}
-	// const rspackPackage = await getRspackPackage()
-	// const packages = [
-	// 	...(options.release ? [] : rspackPackage.npm),
-	// 	...rspackPackage.binding,
-	// 	...rspackPackage.packages,
-	// ]
-	// if (options.release) {
-	// 	for (const pkg of packages) {
-	// 		if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
-	// 			throw new Error(
-	// 				`conflicting overrides[${pkg.name}]=${
-	// 					overrides[pkg.name]
-	// 				} and --release=${
-	// 					options.release
-	// 				} config. Use either one or the other`,
-	// 			)
-	// 		} else {
-	// 			overrides[pkg.name] = options.release
-	// 		}
-	// 	}
-	// } else {
-	// 	await patchBindingPackageJson(rspackPackage.binding)
-	// 	for (const pkg of packages) {
-	// 		overrides[pkg.name] ||= pkg.directory
-	// 	}
-	// }
+	const rspackPackage = await getRspackPackage()
+	const packages = [
+		...(options.release ? [] : rspackPackage.npm),
+		...rspackPackage.binding,
+		...rspackPackage.packages,
+	]
+	if (options.release) {
+		for (const pkg of packages) {
+			if (overrides[pkg.name] && overrides[pkg.name] !== options.release) {
+				throw new Error(
+					`conflicting overrides[${pkg.name}]=${
+						overrides[pkg.name]
+					} and --release=${
+						options.release
+					} config. Use either one or the other`,
+				)
+			} else {
+				overrides[pkg.name] = options.release
+			}
+		}
+	} else {
+		await patchBindingPackageJson(rspackPackage.binding)
+		for (const pkg of packages) {
+			overrides[pkg.name] ||= pkg.directory
+		}
+	}
 	await applyPackageOverrides(dir, pkg, overrides)
 	await afterInstallCommand?.(pkg.scripts)
 	await beforeBuildCommand?.(pkg.scripts)
@@ -488,7 +488,7 @@ async function applyPackageOverrides(
 		throw new Error(`unsupported package manager detected: ${pm}`)
 	}
 	const pkgFile = path.join(dir, 'package.json')
-	// await fs.promises.writeFile(pkgFile, JSON.stringify(pkg, null, 2), 'utf-8')
+	await fs.promises.writeFile(pkgFile, JSON.stringify(pkg, null, 2), 'utf-8')
 
 	// use of `ni` command here could cause lockfile violation errors so fall back to native commands that avoid these
 	if (pm === 'pnpm') {

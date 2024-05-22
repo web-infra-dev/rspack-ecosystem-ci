@@ -33,22 +33,22 @@ runs:
         echo "Corepack version: $(corepack --version)"
         corepack enable
 
-    # - name: Checkout Rspack repo
-    #   uses: actions/checkout@v4
-    #   with:
-    #     repository: ${{ inputs.repository }}
-    #     path: ${{ inputs.path }}
-    #     ref: ${{ inputs.ref }}
-    # - uses: actions/download-artifact@v4
-    #   with:
-    #     name: binding-linux-x64-gnu
-    #     path: ${{ inputs.path }}/npm/linux-x64-gnu
-    # - name: Show restored binding
-    #   shell: bash
-    #   run: ls -lah ${{ inputs.path }}/npm/linux-x64-gnu/*.node
-    # - name: Build Rspack JS
-    #   shell: bash
-    #   run: |
-    #     cd ${{ inputs.path }}
-    #     pnpm i
-    #     pnpm run build:js
+    - name: Checkout Rspack repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repository }}
+        path: ${{ inputs.path }}
+        ref: ${{ inputs.ref }}
+    - uses: actions/download-artifact@v4
+      with:
+        name: binding-linux-x64-gnu
+        path: ${{ inputs.path }}/npm/linux-x64-gnu
+    - name: Show restored binding
+      shell: bash
+      run: ls -lah ${{ inputs.path }}/npm/linux-x64-gnu/*.node
+    - name: Build Rspack JS
+      shell: bash
+      run: |
+        cd ${{ inputs.path }}
+        pnpm i
+        pnpm run build:js

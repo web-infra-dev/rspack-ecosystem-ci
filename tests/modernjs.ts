@@ -17,8 +17,8 @@ export async function test(options: RunOptions) {
 			if (isGitHubActions) {
 				const modernJsDir = join(process.cwd(), 'workspace/modernjs/modern.js')
 				nxCachePath = join(modernJsDir, '.nx/cache')
-				const sha = await $`git rev-parse HEAD`.toString().trim()
-				nxCacheKey = 'modernjs-nx-' + sha
+				const sha = await $`git rev-parse HEAD`
+				nxCacheKey = 'modernjs-nx-' + sha.trim()
 				const restoreKeys = ['modernjs-nx-']
 				const cacheHitKey = await cache.restoreCache(
 					[nxCachePath],
@@ -27,6 +27,8 @@ export async function test(options: RunOptions) {
 				)
 				if (cacheHitKey) {
 					await $`ls -lah .nx/cache`
+				} else {
+					console.log('Not hit cache')
 				}
 			}
 		},
