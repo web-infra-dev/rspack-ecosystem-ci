@@ -46,7 +46,11 @@ runs:
     - name: Show Rust Cache
       if: steps.rust-cache.outputs.cache-hit == 'true'
       shell: bash
-      run: ls -lah ${{ inputs.path }}/target
+      run: |
+        ls -lah ${{ inputs.path }}/target
+        echo "---------------------"
+        total_size=$(du -sh . | awk '{print $1}')
+        echo "Total size of directory contents: $total_size"
     - name: Build Rspack
       shell: bash
       run: |
