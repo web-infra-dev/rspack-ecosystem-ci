@@ -39,18 +39,37 @@ runs:
         npm install -g corepack@0.24.1
         echo "Corepack version: $(corepack --version)"
         corepack enable
-    - id: rust-cache
+    - id: rust-target-cache
+      name: Cache Rust `target`
       uses: MasterworksIO/action-local-cache@2
       with:
         path: '${{ inputs.path }}/target'
-    - name: Show Rust Cache
-      if: steps.rust-cache.outputs.cache-hit == 'true'
+    - name: Show Rust `target` Cache
+      if: steps.rust-target-cache.outputs.cache-hit == 'true'
       shell: bash
       run: |
         ls -lah ${{ inputs.path }}/target
         echo "---------------------"
-        total_size=$(du -sh . | awk '{print $1}')
+        total_size=$(du -sh ${{ inputs.path }}/target | awk '{print $1}')
         echo "Total size of directory contents: $total_size"
+    # - name: Print .cargo path and Export
+    #   shell: bash
+    #   run: |
+    #     CARGO_PATH="${CARGO_HOME:-$HOME/.cargo}"
+    #     echo "CARGO_PATH=$CARGO_PATH" >> $GITHUB_ENV
+    # - id: rust-cargo-cache
+    #   name: Cache Rust `.cargo`
+    #   uses: MasterworksIO/action-local-cache@2
+    #   with:
+    #     path: '${{ env.CARGO_PATH }}'
+    # - name: Show Rust `.cargo` Cache
+    #   if: steps.rust-cargo-cache.outputs.cache-hit == 'true'
+    #   shell: bash
+    #   run: |
+    #     ls -lah ${{ env.CARGO_PATH }}
+    #     echo "---------------------"
+    #     total_size=$(du -sh ${{ env.CARGO_PATH }} | awk '{print $1}')
+    #     echo "Total size of directory contents: $total_size"
     - name: Build Rspack
       shell: bash
       run: |
