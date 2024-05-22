@@ -67,7 +67,6 @@ export async function setupEnvironment(): Promise<EnvironmentData> {
 		...process.env,
 		CI: 'true',
 		TURBO_FORCE: 'true', // disable turbo caching, ecosystem-ci modifies things and we don't want replays
-		NX_SKIP_NX_CACHE: 'true',
 		YARN_ENABLE_IMMUTABLE_INSTALLS: 'false', // to avoid errors with mutated lockfile due to overrides
 		NODE_OPTIONS: '--max-old-space-size=6144', // GITHUB CI has 7GB max, stay below
 		ECOSYSTEM_CI: 'true', // flag for tests, can be used to conditionally skip irrelevant tests.
@@ -221,6 +220,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 		skipGit,
 		verify,
 		beforeInstall,
+		afterInstall,
 		beforeBuild,
 		beforeTest,
 	} = options
@@ -257,6 +257,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	}
 	const agent = options.agent
 	const beforeInstallCommand = toCommand(beforeInstall, agent)
+	const afterInstallCommand = toCommand(afterInstall, agent)
 	const beforeBuildCommand = toCommand(beforeBuild, agent)
 	const beforeTestCommand = toCommand(beforeTest, agent)
 	const buildCommand = toCommand(build, agent)
@@ -264,8 +265,6 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 
 	const pkgFile = path.join(dir, 'package.json')
 	const pkg = JSON.parse(await fs.promises.readFile(pkgFile, 'utf-8'))
-
-	await beforeInstallCommand?.(pkg.scripts)
 
 	if (verify && test) {
 		const frozenInstall = getCommand(agent, 'frozen')
@@ -302,7 +301,8 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 			overrides[pkg.name] ||= pkg.directory
 		}
 	}
-	await applyPackageOverrides(dir, pkg, overrides)
+	await applyPackageOverrides(dir, pkg, overrides, beforeInstallCommand)
+	await afterInstallCommand?.(pkg.scripts)
 	await beforeBuildCommand?.(pkg.scripts)
 	await buildCommand?.(pkg.scripts)
 	if (test) {
@@ -420,6 +420,7 @@ async function applyPackageOverrides(
 	dir: string,
 	pkg: any,
 	overrides: Overrides = {},
+	beforeInstallCommand: ((scripts: any) => Promise<any>) | void,
 ) {
 	const useFileProtocol = (v: string) =>
 		isLocalOverride(v) ? `file:${path.resolve(v)}` : v
@@ -487,6 +488,8 @@ async function applyPackageOverrides(
 	}
 	const pkgFile = path.join(dir, 'package.json')
 	await fs.promises.writeFile(pkgFile, JSON.stringify(pkg, null, 2), 'utf-8')
+
+	await beforeInstallCommand?.(pkg.scripts)
 
 	// use of `ni` command here could cause lockfile violation errors so fall back to native commands that avoid these
 	if (pm === 'pnpm') {

@@ -20,6 +20,7 @@ export interface RunOptions {
 	build?: Task | Task[]
 	test?: Task | Task[]
 	beforeInstall?: Task | Task[]
+	afterInstall?: Task | Task[]
 	beforeBuild?: Task | Task[]
 	beforeTest?: Task | Task[]
 	suiteBranch?: string

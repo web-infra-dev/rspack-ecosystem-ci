@@ -100,6 +100,8 @@ jobs:
         with:
           ref: ${{ inputs.branchName }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
@@ -113,7 +115,7 @@ jobs:
       matrix:
         include:
           - suite: modernjs
-            os: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+            os: ubuntu-latest
           - suite: nx
             os: ubuntu-latest
           - suite: rspress
@@ -133,6 +135,8 @@ jobs:
         with:
           ref: ${{ inputs.branchName }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
