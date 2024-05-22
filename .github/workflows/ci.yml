@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - suite: modernjs
-            os: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+            os: ubuntu-latest
           - suite: _selftest
             os: ubuntu-latest
           - suite: nx
@@ -54,6 +54,8 @@ jobs:
       - name: Lint
         if: matrix.suite == '_selftest'
         run: pnpm lint
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites

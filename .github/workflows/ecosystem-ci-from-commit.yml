@@ -72,6 +72,8 @@ jobs:
         with:
           ref: ${{ inputs.commitSHA }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
@@ -85,7 +87,7 @@ jobs:
       matrix:
         include:
           - suite: modernjs
-            os: ${{ fromJSON(needs.get-runner-labels.outputs.LINUX_RUNNER_LABELS) }}
+            os: ubuntu-latest
           - suite: _selftest
             os: ubuntu-latest
           - suite: nx
@@ -107,6 +109,8 @@ jobs:
         with:
           ref: ${{ inputs.commitSHA }}
       - run: pnpm i --frozen-lockfile
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
       - run: >-
           pnpm tsx ecosystem-ci.ts
           run-suites
