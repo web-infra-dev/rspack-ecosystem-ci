@@ -43,11 +43,6 @@ runs:
       uses: MasterworksIO/action-local-cache@2
       with:
         path: '${{ inputs.path }}/target'
-    - name: Print .cargo path
-      run: echo "$HOME/.cargo"
-    - uses: MasterworksIO/action-local-cache@2
-      with:
-        path: '${{ github.workspace }}/.cargo'
     - name: Show Rust Cache
       if: steps.rust-cache.outputs.cache-hit == 'true'
       shell: bash
