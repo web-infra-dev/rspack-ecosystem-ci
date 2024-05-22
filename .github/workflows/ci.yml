@@ -21,42 +21,42 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-rspack-binding
 
-  # ci:
-  #   needs: [get-runner-labels, prepare-binding]
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - suite: modernjs
-  #           os: ubuntu-latest
-  #         - suite: _selftest
-  #           os: ubuntu-latest
-  #         - suite: nx
-  #           os: ubuntu-latest
-  #         - suite: rspress
-  #           os: ubuntu-latest
-  #         - suite: rsbuild
-  #           os: ubuntu-latest
-  #         - suite: compat
-  #           os: ubuntu-latest
-  #         - suite: examples
-  #           os: ubuntu-latest
-  #     fail-fast: false
-  #   runs-on: ${{ matrix.os }}
-  #   name: ${{ matrix.suite }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: ./.github/actions/build-rspack
-  #     - name: Install
-  #       run: pnpm install --frozen-lockfile --prefer-offline
-  #     - name: Format
-  #       if: matrix.suite == '_selftest'
-  #       run: pnpm format
-  #     - name: Lint
-  #       if: matrix.suite == '_selftest'
-  #       run: pnpm lint
-  #     - name: Expose GitHub Runtime
-  #       uses: crazy-max/ghaction-github-runtime@v3
-  #     - run: >-
-  #         pnpm tsx ecosystem-ci.ts
-  #         run-suites
-  #         ${{ matrix.suite }}
+  ci:
+    needs: [get-runner-labels, prepare-binding]
+    strategy:
+      matrix:
+        include:
+          - suite: modernjs
+            os: ubuntu-latest
+          - suite: _selftest
+            os: ubuntu-latest
+          - suite: nx
+            os: ubuntu-latest
+          - suite: rspress
+            os: ubuntu-latest
+          - suite: rsbuild
+            os: ubuntu-latest
+          - suite: compat
+            os: ubuntu-latest
+          - suite: examples
+            os: ubuntu-latest
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.suite }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-rspack
+      - name: Install
+        run: pnpm install --frozen-lockfile --prefer-offline
+      - name: Format
+        if: matrix.suite == '_selftest'
+        run: pnpm format
+      - name: Lint
+        if: matrix.suite == '_selftest'
+        run: pnpm lint
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v3
+      - run: >-
+          pnpm tsx ecosystem-ci.ts
+          run-suites
+          ${{ matrix.suite }}

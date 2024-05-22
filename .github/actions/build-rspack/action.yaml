@@ -23,15 +23,17 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
     - shell: bash
       name: Install package manager
       run: |
         npm install -g corepack@0.24.1
         echo "Corepack version: $(corepack --version)"
         corepack enable
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'pnpm'
 
     - name: Checkout Rspack repo
       uses: actions/checkout@v4
