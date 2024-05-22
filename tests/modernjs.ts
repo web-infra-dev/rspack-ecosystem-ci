@@ -16,9 +16,9 @@ export async function test(options: RunOptions) {
 		beforeInstall: async () => {
 			if (isGitHubActions) {
 				const modernJsDir = join(process.cwd(), 'workspace/modernjs/modern.js')
-				nxCachePath = join(modernJsDir, '.nx/cache') + '/'
-				nxCacheKey =
-					'modernjs-nx-' + (await $`git rev-parse HEAD`.toString().trim())
+				nxCachePath = join(modernJsDir, '.nx/cache')
+				const sha = await $`git rev-parse HEAD`.toString().trim()
+				nxCacheKey = 'modernjs-nx-' + sha
 				const restoreKeys = ['modernjs-nx-']
 				const cacheHitKey = await cache.restoreCache(
 					[nxCachePath],
@@ -26,13 +26,14 @@ export async function test(options: RunOptions) {
 					restoreKeys,
 				)
 				if (cacheHitKey) {
-					await $`ls -lah ${nxCachePath}`
+					await $`ls -lah .nx/cache`
 				}
 			}
 		},
 		afterInstall: async () => {
 			if (isGitHubActions) {
-				await cache.saveCache([nxCachePath], nxCacheKey)
+				await $`ls -lah .nx/cache`
+				await cache.saveCache([`${nxCachePath}/**`], nxCacheKey)
 			}
 		},
 		beforeTest: async () => {
