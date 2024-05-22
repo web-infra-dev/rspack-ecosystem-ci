@@ -70,6 +70,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
         with:
+          repository: ${{ inputs.repo }}
           ref: ${{ inputs.commitSHA }}
       - run: pnpm i --frozen-lockfile
       - name: Expose GitHub Runtime
@@ -107,6 +108,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/build-rspack
         with:
+          repository: ${{ inputs.repo }}
           ref: ${{ inputs.commitSHA }}
       - run: pnpm i --frozen-lockfile
       - name: Expose GitHub Runtime
