@@ -266,8 +266,6 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 	const pkgFile = path.join(dir, 'package.json')
 	const pkg = JSON.parse(await fs.promises.readFile(pkgFile, 'utf-8'))
 
-	await beforeInstallCommand?.(pkg.scripts)
-
 	if (verify && test) {
 		const frozenInstall = getCommand(agent, 'frozen')
 		await $`${frozenInstall}`
@@ -303,7 +301,7 @@ export async function runInRepo(options: RunOptions & RepoOptions) {
 			overrides[pkg.name] ||= pkg.directory
 		}
 	}
-	await applyPackageOverrides(dir, pkg, overrides)
+	await applyPackageOverrides(dir, pkg, overrides, beforeInstallCommand)
 	await afterInstallCommand?.(pkg.scripts)
 	await beforeBuildCommand?.(pkg.scripts)
 	await buildCommand?.(pkg.scripts)
@@ -422,6 +420,7 @@ async function applyPackageOverrides(
 	dir: string,
 	pkg: any,
 	overrides: Overrides = {},
+	beforeInstallCommand: ((scripts: any) => Promise<any>) | void,
 ) {
 	const useFileProtocol = (v: string) =>
 		isLocalOverride(v) ? `file:${path.resolve(v)}` : v
@@ -489,6 +488,8 @@ async function applyPackageOverrides(
 	}
 	const pkgFile = path.join(dir, 'package.json')
 	await fs.promises.writeFile(pkgFile, JSON.stringify(pkg, null, 2), 'utf-8')
+
+	await beforeInstallCommand?.(pkg.scripts)
 
 	// use of `ni` command here could cause lockfile violation errors so fall back to native commands that avoid these
 	if (pm === 'pnpm') {
