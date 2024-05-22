@@ -67,7 +67,6 @@ export async function setupEnvironment(): Promise<EnvironmentData> {
 		...process.env,
 		CI: 'true',
 		TURBO_FORCE: 'true', // disable turbo caching, ecosystem-ci modifies things and we don't want replays
-		NX_SKIP_NX_CACHE: 'true',
 		YARN_ENABLE_IMMUTABLE_INSTALLS: 'false', // to avoid errors with mutated lockfile due to overrides
 		NODE_OPTIONS: '--max-old-space-size=6144', // GITHUB CI has 7GB max, stay below
 		ECOSYSTEM_CI: 'true', // flag for tests, can be used to conditionally skip irrelevant tests.
