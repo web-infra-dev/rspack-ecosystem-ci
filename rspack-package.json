@@ -7,6 +7,10 @@
 	],
 	"packages": [
 		{
+			"name": "@rspack/lite-tapable",
+			"directory": "packages/rspack-lite-tapable"
+		},
+		{
 			"name": "@rspack/core",
 			"directory": "packages/rspack"
 		},
