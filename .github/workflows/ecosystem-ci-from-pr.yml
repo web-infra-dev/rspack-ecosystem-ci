@@ -33,7 +33,6 @@ on:
           - nx
           - rspress
           - rsbuild
-          - compat
           - examples
       suiteRefType:
         description: "type of suite ref to use"
@@ -122,8 +121,6 @@ jobs:
           - suite: rspress
             os: ubuntu-latest
           - suite: rsbuild
-            os: ubuntu-latest
-          - suite: compat
             os: ubuntu-latest
           - suite: examples
             os: ubuntu-latest
