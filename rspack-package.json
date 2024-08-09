@@ -7,24 +7,12 @@
 	],
 	"packages": [
 		{
-			"name": "@rspack/lite-tapable",
-			"directory": "packages/rspack-lite-tapable"
-		},
-		{
 			"name": "@rspack/core",
 			"directory": "packages/rspack"
 		},
 		{
 			"name": "@rspack/dev-server",
 			"directory": "packages/rspack-dev-server"
-		},
-		{
-			"name": "@rspack/plugin-minify",
-			"directory": "packages/rspack-plugin-minify"
-		},
-		{
-			"name": "@rspack/plugin-react-refresh",
-			"directory": "packages/rspack-plugin-react-refresh"
 		}
 	],
 	"npm": {
