@@ -38,6 +38,8 @@ jobs:
             os: ubuntu-latest
           - suite: examples
             os: ubuntu-latest
+				  - suite: rslib
+            os: ubuntu-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.suite }}
