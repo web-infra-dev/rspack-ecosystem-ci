@@ -27,6 +27,7 @@ on:
           - modernjs
           - nx
           - rspress
+          - rslib
           - rsbuild
           - examples
       suiteRefType:
@@ -93,6 +94,8 @@ jobs:
           - suite: nx
             os: ubuntu-latest
           - suite: rspress
+            os: ubuntu-latest
+          - suite: rslib
             os: ubuntu-latest
           - suite: rsbuild
             os: ubuntu-latest
