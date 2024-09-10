@@ -6,7 +6,7 @@ export async function test(options: RunOptions) {
 		...options,
 		repo: 'nrwl/nx-labs',
 		branch: 'main',
-		build: ['yarn nx build --skip-nx-cache rspack'],
+		build: ['yarn nx reset', 'yarn nx build --skip-nx-cache rspack'],
 		test: [
 			'yarn nx test --skip-nx-cache rspack',
 			'yarn nx e2e --skip-nx-cache rspack-e2e',
