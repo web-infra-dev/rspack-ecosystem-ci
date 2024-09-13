@@ -144,6 +144,7 @@ export async function setupRepo(options: RepoOptions) {
 		if (tag || commit) {
 			await $`git reset --hard ${tag || commit}`
 		}
+		await $`git log -1 --format='%H'`
 	}
 }
 
