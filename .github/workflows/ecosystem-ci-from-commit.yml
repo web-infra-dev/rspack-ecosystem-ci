@@ -30,6 +30,7 @@ on:
           - rslib
           - rsbuild
           - examples
+          - devserver
       suiteRefType:
         description: "type of suite ref to use"
         required: true
@@ -100,6 +101,8 @@ jobs:
           - suite: rsbuild
             os: ubuntu-latest
           - suite: examples
+            os: ubuntu-latest
+          - suite: devserver
             os: ubuntu-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
