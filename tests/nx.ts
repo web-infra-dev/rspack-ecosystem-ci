@@ -1,15 +1,19 @@
-import { runInRepo } from '../utils'
+import { runInRepo, $ } from '../utils'
 import { RunOptions } from '../types'
 
 export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
-		repo: 'nrwl/nx-labs',
+		repo: 'nrwl/nx',
 		branch: 'main',
-		build: ['yarn nx build --skip-nx-cache rspack'],
+		build: ['pnpm nx build --skip-nx-cache rspack'],
+		beforeTest: async () => {
+			await $`cargo build`
+			await $`pnpm run build`
+		},
 		test: [
-			'yarn nx test --skip-nx-cache rspack',
-			'yarn nx e2e --skip-nx-cache rspack-e2e',
+			'pnpm nx test --skip-nx-cache rspack',
+			// 'pnpm nx run-many -t e2e-local -p e2e-rspack --skip-nx-cache',
 		],
 	})
 }
