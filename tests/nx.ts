@@ -8,7 +8,7 @@ export async function test(options: RunOptions) {
 		branch: 'master',
 		beforeTest: async () => {
 			await $`cargo build`
-			await $`pnpm run build`
+			await $`pnpm run build --skip-nx-cache`
 		},
 		test: [
 			'pnpm nx test --skip-nx-cache rspack',
