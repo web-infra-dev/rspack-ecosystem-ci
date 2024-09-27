@@ -5,7 +5,7 @@ export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
 		repo: 'nrwl/nx',
-		branch: 'main',
+		branch: 'master',
 		build: ['pnpm nx build --skip-nx-cache rspack'],
 		beforeTest: async () => {
 			await $`cargo build`
