@@ -7,11 +7,12 @@ export async function test(options: RunOptions) {
 		repo: 'nrwl/nx',
 		branch: 'master',
 		beforeTest: async () => {
+			await $`export NX_DAEMON=false`
 			await $`cargo build`
-			await $`export NX_DAEMON=false; pnpm run build --skip-nx-cache`
+			await $`pnpm run build --skip-nx-cache`
 		},
 		test: [
-			'export NX_DAEMON=false; pnpm nx test --skip-nx-cache rspack',
+			'pnpm nx test --skip-nx-cache rspack',
 			// 'pnpm nx run-many -t e2e-local -p e2e-rspack --skip-nx-cache',
 		],
 	})
