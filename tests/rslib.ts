@@ -1,4 +1,4 @@
-import { runInRepo } from '../utils'
+import { runInRepo, $, cd } from '../utils'
 import { RunOptions } from '../types'
 
 export async function test(options: RunOptions) {
@@ -6,6 +6,11 @@ export async function test(options: RunOptions) {
 		...options,
 		repo: 'web-infra-dev/rslib',
 		branch: process.env.RSLIB ?? 'main',
-		test: ['test:artifact'],
+		beforeTest: async () => {
+			cd('./tests')
+			await $`pnpm playwright install --with-deps`
+			cd('..')
+		},
+		test: ['test'],
 	})
 }
