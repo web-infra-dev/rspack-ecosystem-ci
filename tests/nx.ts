@@ -11,7 +11,7 @@ export async function test(options: RunOptions) {
 			await $`export NX_DAEMON=false; pnpm run build --skip-nx-cache`
 		},
 		test: [
-			'pnpm nx test --skip-nx-cache rspack',
+			'export NX_DAEMON=false; pnpm nx test --skip-nx-cache rspack',
 			// 'pnpm nx run-many -t e2e-local -p e2e-rspack --skip-nx-cache',
 		],
 	})
