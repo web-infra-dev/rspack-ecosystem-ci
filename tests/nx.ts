@@ -9,7 +9,7 @@ export async function test(options: RunOptions) {
 		beforeTest: async () => {
 			await $`cargo build`
 			await $`pnpm nx reset`
-			await $`pnpm run build rspack --skip-nx-cache --verbose`
+			await $`pnpm nx build rspack --skip-nx-cache --verbose`
 		},
 		test: [
 			'pnpm nx test rspack --skip-nx-cache --verbose',
