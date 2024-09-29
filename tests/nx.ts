@@ -8,10 +8,11 @@ export async function test(options: RunOptions) {
 		branch: 'master',
 		beforeTest: async () => {
 			await $`cargo build`
-			await $`pnpm run build --skip-nx-cache --verbose`
+			await $`pnpm nx reset`
+			await $`pnpm run build rspack --skip-nx-cache --verbose`
 		},
 		test: [
-			'pnpm nx test --skip-nx-cache rspack --verbose',
+			'pnpm nx test rspack --skip-nx-cache --verbose',
 			// 'pnpm nx run-many -t e2e-local -p e2e-rspack --skip-nx-cache',
 		],
 	})
