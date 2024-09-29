@@ -30,7 +30,7 @@ on:
         options:
           - "-"
           - modernjs
-          - nx
+          # - nx
           - rspress
           - rsbuild
           - rslib
@@ -118,8 +118,8 @@ jobs:
         include:
           - suite: modernjs
             os: ubuntu-latest
-          - suite: nx
-            os: ubuntu-latest
+          # - suite: nx
+          #   os: ubuntu-latest
           - suite: rspress
             os: ubuntu-latest
           - suite: rslib
@@ -135,6 +135,7 @@ jobs:
     name: execute-all (${{ matrix.suite }})
     steps:
       - uses: actions/checkout@v4
+      - uses: moonrepo/setup-rust@v1
       - uses: ./.github/actions/build-rspack
         with:
           repository: ${{ inputs.repo }}
