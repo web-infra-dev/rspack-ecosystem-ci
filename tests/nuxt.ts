@@ -9,8 +9,9 @@ export async function test(options: RunOptions) {
 		beforeTest: async () => {
 			await $`pnpm playwright-core install chromium`
 		},
-		test: [
-			'TEST_ENV=built TEST_BUILDER=rspack TEST_MANIFEST=manifest-on TEST_CONTEXT=async TEST_PAYLOAD=json SKIP_BUNDLE_SIZE=true pnpm test:fixtures',
-		],
+		test: async () => {
+			await $`export TEST_ENV=built TEST_BUILDER=rspack TEST_MANIFEST=manifest-on TEST_CONTEXT=async TEST_PAYLOAD=json SKIP_BUNDLE_SIZE=true`
+			await $`pnpm test:fixtures`
+		},
 	})
 }
