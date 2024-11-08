@@ -1,7 +1,7 @@
 import { runInRepo, $ } from '../utils'
 import { RunOptions } from '../types'
+import { execaCommand } from 'execa'
 
-let initialProcessEnv
 export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
@@ -9,8 +9,11 @@ export async function test(options: RunOptions) {
 		branch: 'main',
 		build: ['dev:prepare', 'build'],
 		beforeTest: async () => {
-			initialProcessEnv = process.env
-			process.env = {
+			await $`pnpm playwright-core install chromium`
+		},
+		test: async () => {
+			let initialProcessEnv = process.env
+			const env = {
 				...initialProcessEnv,
 				TEST_ENV: 'built',
 				TEST_BUILDER: 'rspack',
@@ -19,12 +22,11 @@ export async function test(options: RunOptions) {
 				TEST_PAYLOAD: 'json',
 				SKIP_BUNDLE_SIZE: 'true',
 			}
-			await $`pnpm playwright-core install chromium`
-		},
-		test: async () => {
-			await $`echo $TEST_BUILDER` // confirm that builder is set to rspack
-			await $`[ "\${TEST_BUILDER}" = "rspack" ] || exit 1` // confirm that builder is set to rspack
-			await $`pnpm run test:fixtures`
+			await execaCommand('pnpm run test:fixtures', {
+				shell: true,
+				env,
+				stdout: 'inherit',
+			})
 		},
 	})
 }
