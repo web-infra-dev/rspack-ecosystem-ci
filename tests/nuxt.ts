@@ -21,6 +21,10 @@ export async function test(options: RunOptions) {
 			}
 			await $`pnpm playwright-core install chromium`
 		},
-		test: ['test:fixtures'],
+		test: async () => {
+			await $`echo $TEST_BUILDER` // confirm that builder is set to rspack
+			await $`[ "\${TEST_BUILDER}" = "rspack" ] || exit 1` // confirm that builder is set to rspack
+			await $`pnpm run test:fixtures`
+		},
 	})
 }
