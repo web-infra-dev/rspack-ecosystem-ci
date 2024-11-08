@@ -26,6 +26,8 @@ export async function test(options: RunOptions) {
 				shell: true,
 				env,
 				stdout: 'inherit',
+				stderr: 'inherit',
+				stdin: 'inherit',
 			})
 		},
 	})
