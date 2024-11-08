@@ -1,14 +1,15 @@
 import { runInRepo, $ } from '../utils'
 import { RunOptions } from '../types'
 
-let initialProcessEnv;
+let initialProcessEnv
 export async function test(options: RunOptions) {
 	await runInRepo({
 		...options,
 		repo: 'nuxt/nuxt',
 		branch: 'main',
+		build: ['dev:prepare', 'build'],
 		beforeTest: async () => {
-			initialProcessEnv = process.env;
+			initialProcessEnv = process.env
 			process.env = {
 				...initialProcessEnv,
 				TEST_ENV: 'built',
