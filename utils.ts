@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
-import { execaCommand } from 'execa'
+import { execaCommand, type Options } from 'execa'
 import {
 	EnvironmentData,
 	Overrides,
@@ -42,6 +42,34 @@ export async function $(literals: TemplateStringsArray, ...values: any[]) {
 		env,
 		stdio: 'pipe',
 		cwd,
+	})
+	proc.stdin && process.stdin.pipe(proc.stdin)
+	proc.stdout && proc.stdout.pipe(process.stdout)
+	proc.stderr && proc.stderr.pipe(process.stderr)
+	const result = await proc
+
+	if (isGitHubActions) {
+		actionsCore.endGroup()
+		const cost = Math.ceil((Date.now() - start) / 1000)
+		console.log(`Cost for \`${cmd}\`: ${cost} s`)
+	}
+
+	return result.stdout
+}
+
+export const execa = async (cmd: string, options?: Options) => {
+	const start = Date.now()
+	if (isGitHubActions) {
+		actionsCore.startGroup(`${cwd} $> ${cmd}`)
+	} else {
+		console.log(`${cwd} $> ${cmd}`)
+	}
+
+	const proc = execaCommand(cmd, {
+		env,
+		cwd,
+		stdio: 'pipe',
+		...options,
 	})
 	proc.stdin && process.stdin.pipe(proc.stdin)
 	proc.stdout && proc.stdout.pipe(process.stdout)
