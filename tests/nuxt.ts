@@ -11,9 +11,8 @@ export async function test(options: RunOptions) {
 			await $`pnpm playwright-core install chromium`
 		},
 		test: async () => {
-			let initialProcessEnv = process.env
 			const env = {
-				...initialProcessEnv,
+				...process.env,
 				TEST_ENV: 'built',
 				TEST_BUILDER: 'rspack',
 				TEST_MANIFEST: 'manifest-on',
