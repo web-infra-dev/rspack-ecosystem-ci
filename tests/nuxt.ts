@@ -21,9 +21,10 @@ export async function test(options: RunOptions) {
 				TEST_PAYLOAD: 'json',
 				SKIP_BUNDLE_SIZE: 'true',
 			}
+			// echo the TEST_BUILDER env var to confirm that it's set
 			await execa('echo $TEST_BUILDER && pnpm run test:fixtures', {
 				env,
-				shell: true
+				shell: true,
 			})
 		},
 	})
