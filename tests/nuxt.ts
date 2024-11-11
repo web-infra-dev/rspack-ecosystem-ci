@@ -1,6 +1,5 @@
-import { runInRepo, $ } from '../utils'
+import { runInRepo, $, execa } from '../utils'
 import { RunOptions } from '../types'
-import { execaCommand } from 'execa'
 
 export async function test(options: RunOptions) {
 	await runInRepo({
@@ -22,12 +21,9 @@ export async function test(options: RunOptions) {
 				TEST_PAYLOAD: 'json',
 				SKIP_BUNDLE_SIZE: 'true',
 			}
-			await execaCommand('pnpm run test:fixtures', {
-				shell: true,
+			await execa('echo $TEST_BUILDER && pnpm run test:fixtures', {
 				env,
-				stdout: 'inherit',
-				stderr: 'inherit',
-				stdin: 'inherit',
+				shell: true
 			})
 		},
 	})
