@@ -127,6 +127,8 @@ jobs:
             os: ubuntu-latest
           - suite: devserver
             os: ubuntu-latest
+          - suite: nuxt
+            os: ubuntu-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
     name: execute-all (${{ matrix.suite }})
