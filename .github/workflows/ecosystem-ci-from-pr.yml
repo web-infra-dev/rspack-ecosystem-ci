@@ -126,6 +126,8 @@ jobs:
             os: ubuntu-latest
           - suite: rsbuild
             os: ubuntu-latest
+          - suite: rsdoctor
+            os: ubuntu-latest
           - suite: examples
             os: ubuntu-latest
           - suite: devserver

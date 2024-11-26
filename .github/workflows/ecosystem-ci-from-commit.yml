@@ -94,6 +94,8 @@ jobs:
             os: ubuntu-latest
           # - suite: nx
           #   os: ubuntu-latest
+          - suite: rsdoctor
+            os: ubuntu-latest
           - suite: rspress
             os: ubuntu-latest
           - suite: rslib
