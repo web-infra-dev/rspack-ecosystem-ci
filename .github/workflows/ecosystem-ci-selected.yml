@@ -40,6 +40,7 @@ on:
           - rspress
           - rsbuild
           - rslib
+          - rsdoctor
           - examples
           - devserver
       suiteRefType:
@@ -122,6 +123,8 @@ jobs:
           - suite: rslib
             os: ubuntu-latest
           - suite: rsbuild
+            os: ubuntu-latest
+          - suite: rsdoctor
             os: ubuntu-latest
           - suite: examples
             os: ubuntu-latest
