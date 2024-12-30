@@ -55,7 +55,6 @@ on:
 jobs:
   get-runner-labels:
     name: Get Runner Labels
-    needs: create-comment
     uses: ./.github/workflows/get-runner-labels.yml
 
   prepare-binding:
