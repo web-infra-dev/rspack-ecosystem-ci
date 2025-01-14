@@ -13,6 +13,10 @@
 		{
 			"name": "@rspack/dev-server",
 			"directory": "packages/rspack-dev-server"
+		},
+		{
+			"name": "@rspack/tracing",
+			"directory": "packages/rspack-tracing"
 		}
 	],
 	"npm": {
