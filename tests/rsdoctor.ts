@@ -7,10 +7,8 @@ export async function test(options: RunOptions) {
 		repo: 'web-infra-dev/rsdoctor',
 		branch: process.env.RSDOCTOR ?? 'main',
 		beforeTest: async () => {
-			cd('./e2e')
 			await $`pnpm playwright install --with-deps`
-			cd('..')
 		},
-		test: ['e2e'],
+		test: ['test:all'],
 	})
 }
