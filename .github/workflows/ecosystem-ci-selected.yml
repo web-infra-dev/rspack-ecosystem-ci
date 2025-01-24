@@ -78,7 +78,7 @@ jobs:
 
   execute-selected-suite:
     needs: prepare-binding
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: "inputs.suite != '-'"
     steps:
       - uses: actions/checkout@v4
@@ -115,23 +115,23 @@ jobs:
       matrix:
         include:
           - suite: modernjs
-            os: ubuntu-latest
+            os: ubuntu-22.04
           # - suite: nx
-          #   os: ubuntu-latest
+          #   os: ubuntu-22.04
           - suite: rspress
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: rslib
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: rsbuild
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: rsdoctor
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: examples
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: devserver
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - suite: nuxt
-            os: ubuntu-latest
+            os: ubuntu-22.04
       fail-fast: false
     runs-on: ${{ matrix.os }}
     name: execute-all (${{ matrix.suite }})
