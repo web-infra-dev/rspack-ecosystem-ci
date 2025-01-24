@@ -16,7 +16,7 @@ on:
 jobs:
   main:
     name: Get Runner Labels
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       LINUX_RUNNER_LABELS: ${{ steps.run.outputs.LINUX_RUNNER_LABELS }}
       MACOS_RUNNER_LABELS: ${{ steps.run.outputs.MACOS_RUNNER_LABELS }}
@@ -26,6 +26,6 @@ jobs:
         shell: bash
         run: |
           # set default value for vars.XXX_RUNNER_LABELS
-          echo 'LINUX_RUNNER_LABELS=${{ vars.LINUX_RUNNER_LABELS || '"ubuntu-latest"' }}' >> "$GITHUB_OUTPUT"
+          echo 'LINUX_RUNNER_LABELS=${{ vars.LINUX_RUNNER_LABELS || '"ubuntu-22.04"' }}' >> "$GITHUB_OUTPUT"
           echo 'MACOS_RUNNER_LABELS=${{ vars.MACOS_RUNNER_LABELS || '"macos-latest"' }}' >> "$GITHUB_OUTPUT"
           echo 'WINDOWS_RUNNER_LABELS=${{ vars.WINDOWS_RUNNER_LABELS || '"windows-latest"' }}' >> "$GITHUB_OUTPUT"
